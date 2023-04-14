@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "WARP",
+            "includePath": [
+                "${workspaceFolder}/Headers/**",
+                "${workspaceFolder}/PrivateHeaders/**"
+            ],
+            "defines": []
+        }
+    ],
+    "version": 4
+}

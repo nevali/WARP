@@ -23,7 +23,10 @@ namespace WARP
 			virtual ~Conduit();
 		protected:
 			virtual void processPipeEvents(void);
-			virtual void processPayload(Packets::Payload *payload);
+			virtual void processIdent(Packets::Ident *packet);
+			virtual void processConnectionOpened(Packets::ConnectionOpened *packet);
+			virtual void processConnectionClosed(Packets::ConnectionClosed *packet);
+			virtual void processPayload(Packets::Payload *packet);
 		protected:
 			/* MuxDelegate */
 			virtual void packetRead(Socket *socket, Packet *packet);
@@ -72,20 +75,49 @@ Conduit::packetRead(Socket *socket, Packet *packet)
 	tracef("Conduit::packetRead()\n");
 	switch(packet->type())
 	{
+		case Packet::PKT_IDENT:
+			processIdent(static_cast<Packets::Ident *>(packet));
+			return;
+		case Packet::PKT_OPEN:
+			processConnectionOpened(static_cast<Packets::ConnectionOpened *>(packet));
+			return;
+		case Packet::PKT_CLOSE:
+			processConnectionClosed(static_cast<Packets::ConnectionClosed *>(packet));
+			return;
 		case Packet::PKT_PAYLOAD:
 			processPayload(static_cast<Packets::Payload *>(packet));
-			break;
+			return;
 		default:
 			diagf(DIAG_WARNING, "Conduit: unsupported packet type %d\n", (int) packet->type());
 	}
 }
 
 void
-Conduit::processPayload(Packets::Payload *payload)
+Conduit::processIdent(Packets::Ident *packet)
 {
-	tracef("Conduit::processPayload(#%d, [%lu bytes])\n", payload->connection(), payload->size());
+	(void) packet;
+	
+	tracef("Conduit::processIdent()\n");
+}
+
+void
+Conduit::processConnectionOpened(Packets::ConnectionOpened *packet)
+{
+	tracef("Conduit::processConnectionOpened(#%d)\n", packet->id());
+}
+
+void
+Conduit::processConnectionClosed(Packets::ConnectionClosed *packet)
+{
+	tracef("Conduit::processConnectionClosed(#%d)\n", packet->id());
+}
+
+void
+Conduit::processPayload(Packets::Payload *packet)
+{
+	tracef("Conduit::processPayload(#%d, [%lu bytes])\n", packet->connection(), packet->size());
 	debugf("---------------------------------------------------------------------\n");
-	dump(payload->buffer(), payload->size());
+	dump(packet->buffer(), packet->size());
 	debugf("---------------------------------------------------------------------\n");
 }
 

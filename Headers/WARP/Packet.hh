@@ -66,6 +66,7 @@ namespace WARP
 		public:
 			virtual Encoded *encode(void *buf, size_t bufsize) = 0;
 			static Packet *decode(Packet::Encoded *encoded);
+			virtual Type type(void) const;
 		protected:
 			Type _type;
 			static uint16_t _nextSeq;
@@ -77,6 +78,8 @@ namespace WARP
 			PayloadPacket(int connection, const void *buf, size_t buflen):
 				Packet(PKT_PAYLOAD), _conn(connection), _buf(buf), _buflen(buflen) {}
 			virtual Encoded *encode(void *buf, size_t bufsize);
+			virtual const uint8_t *buffer(void) const;
+			virtual size_t size(void) const;
 		protected:
 			int _conn;
 			const void *_buf;

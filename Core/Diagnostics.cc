@@ -30,7 +30,7 @@ using namespace WARP;
 
 typedef uintptr_t ADDR;
 
-static uint8_t *dump_row(uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr);
+static const uint8_t *dump_row(const uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr);
 static void diag_prefix(DiagnosticLevel level, char *buf, size_t bufsize);
 static void writeBuf(void);
 
@@ -119,7 +119,7 @@ WARP::tracef(const char *format, ...)
  *
  */
 void
-WARP::dump(uint8_t *base, size_t length, size_t baseaddr)
+WARP::dump(const uint8_t *base, size_t length, size_t baseaddr)
 {
 	ADDR offset;
 	
@@ -211,8 +211,8 @@ writeBuf(void)
  *
  * The return value is a pointer to the next unwritten byte from base
  */
-static uint8_t *
-dump_row(uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr)
+static const uint8_t *
+dump_row(const uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr)
 {
 	uint8_t byte;
 	char strbuf[DUMPWIDTH + 1];
@@ -223,8 +223,16 @@ dump_row(uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr)
 	assert(skip <= width);
 	diag_prefix(DIAG_DEBUG, diagbuf.base(), diagbuf.size());
 	ptr = strchr(diagbuf.base(), 0);
-//	debugf("baseaddr = %p, skip = %u\n", baseaddr, skip);
-	snprintf(ptr, diagbuf.remaining(ptr), ADDRFORMAT " ", (ADDR) (baseaddr - skip));
+//	debugf("base = %p, baseaddr = %p, skip = %u\n", base, baseaddr, skip);
+	if(baseaddr - skip > baseaddr)
+	{
+		/* handle underflow slightly gracefully */
+		snprintf(ptr, diagbuf.remaining(ptr), ADDRFORMAT " ", (ADDR) 0);
+	}
+	else
+	{
+		snprintf(ptr, diagbuf.remaining(ptr), ADDRFORMAT " ", (ADDR) (baseaddr - skip));
+	}
 	ptr = strchr(diagbuf.base(), 0);
 	index = 0;
 	/* if skip is nonzero, the first displayed byte is not aligned on
@@ -235,6 +243,7 @@ dump_row(uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr)
 	{
 		*ptr = ' '; ptr++;
 		*ptr = ' '; ptr++;
+		strbuf[index] = ' ';
 		for(index++; index < skip; ++index)
 		{
 			*ptr = ' '; ptr++;
@@ -257,7 +266,7 @@ dump_row(uint8_t *base, size_t width, ADDR *length, size_t skip, ADDR baseaddr)
 		 */
 		if(index)
 		{
-			*ptr = (index % 8) ? ' ' : '-';
+			*ptr = ((skip && !(skip % 8)) || index % 8) ? ' ' : '-';
 			ptr++;
 		}
 		/* add the byte itself in uppercase hexadecimal */

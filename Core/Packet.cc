@@ -45,6 +45,12 @@ Packet::decode(Packet::Encoded *encoded)
 	return packet;
 }
 
+Packet::Type
+Packet::type(void) const
+{
+	return _type;
+}
+
 ssize_t
 Packet::Encoded::send(int fd)
 {
@@ -68,4 +74,16 @@ PayloadPacket::encode(void *buf, size_t bufsize)
 	encoded->payload.socket = _conn;
 	memcpy(encoded->payload.data, _buf, _buflen);
 	return encoded;
+}
+
+const uint8_t *
+PayloadPacket::buffer(void) const
+{
+	return (const uint8_t *) _buf;
+}
+
+size_t
+PayloadPacket::size(void) const
+{
+	return _buflen;
 }

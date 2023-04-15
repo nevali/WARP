@@ -20,7 +20,7 @@ namespace WARP
 		DIAG_TRACE = -7
 	} DiagnosticLevel;
 
-	void dump(uint8_t *base, size_t length, size_t baseaddr = 0);
+	void dump(const uint8_t *base, size_t length, size_t baseaddr = 0);
 
 	void diag(DiagnosticLevel level, const char *str);
 	void vdiagf(DiagnosticLevel level, const char *format, va_list ap);

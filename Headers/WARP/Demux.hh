@@ -10,7 +10,7 @@ namespace WARP
 	class Demux: public Listener
 	{
 		public:
-			Demux(MuxDelegate *delegate);
+			Demux(MuxDelegate *delegate, int fd = 0);
 			virtual ~Demux();
 		public:
 			virtual void processSet(fd_set *fds);

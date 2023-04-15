@@ -23,22 +23,6 @@ namespace WARP
 			MuxDelegate *_delegate;
 			Buffer _writeBuf;
 	};
-
-	class Demux: public Listener
-	{
-		public:
-			Demux(MuxDelegate *delegate);
-			virtual ~Demux();
-		public:
-			virtual void processSet(fd_set *fds);
-			virtual Packet::Encoded *demux(const void *buf, size_t buflen);
-			virtual void socketReadBuffer(Socket *socket,const void *buf, size_t buflen);
-		protected:
-			virtual Client *accept(void);
-			virtual bool supportedPacketType(Packet::Type type);
-		protected:
-			MuxDelegate *_delegate;
-	};
 }
 
 #endif /*!WARP_MUX_HH_*/

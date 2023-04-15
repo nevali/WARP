@@ -2,6 +2,7 @@
 # define BEACON_DEBUGMUX_HH_
 
 # include "WARP/Mux.hh"
+# include "WARP/Demux.hh"
 
 namespace WARP
 {

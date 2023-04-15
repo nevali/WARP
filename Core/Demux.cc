@@ -10,17 +10,17 @@
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Mux.hh"
+#include "WARP/Demux.hh"
 
 using namespace WARP;
 
-Demux::Demux(MuxDelegate *delegate):
+Demux::Demux(MuxDelegate *delegate, int fd):
 	Listener(delegate),
 	_delegate(delegate)
 {
 	int flags;
 
-	_fd = STDIN_FILENO;
+	_fd = fd;
 
 	/* set non-blocking mode on the input descriptor so that reads don't hang */	
 	flags = fcntl(_fd, F_GETFL, 0);
@@ -75,7 +75,7 @@ Demux::demux(const void *buf, size_t buflen)
 	}
 	encoded = (Packet::Encoded *) buf;
 	/* Validate that the packet is valid and we have all of it */
-	if(encoded->length >= buflen)
+	if(encoded->length > buflen)
 	{
 		debugf("Demux: buffer does not contain whole packet (expected %u bytes, have %u bytes)\n", (unsigned) encoded->length, (unsigned) buflen);
 		return NULL;

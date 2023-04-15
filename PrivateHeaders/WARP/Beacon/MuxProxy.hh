@@ -3,6 +3,7 @@
 
 # include "WARP/Listener.hh"
 # include "WARP/Mux.hh"
+# include "WARP/Demux.hh"
 # include "WARP/Server.hh"
 
 namespace WARP

@@ -11,35 +11,42 @@
 
 #include "WARP/SubTask.hh"
 #include "WARP/Packet.hh"
+#include "WARP/Demux.hh"
 
 namespace WARP
 {
-	class Conduit: public SubTask
+	class Conduit: public SubTask, public MuxDelegate
 	{
 		public:
 			Conduit();
 			virtual ~Conduit();
 		protected:
 			virtual void processPipeEvents(void);
+			virtual void processPayload(PayloadPacket *payload);
+		protected:
+			/* MuxDelegate */
+			virtual void packetRead(Socket *socket, Packet *packet);
 		protected:
 			Pipe _inputPipe;
 			Pipe _outputPipe;
+			Demux *_demux;
 	};
 }
 
 using namespace WARP;
 
 Conduit::Conduit():
-	SubTask()
+	SubTask(),
+	_demux(NULL)
 {
 	bindInput(&_inputPipe);
 	bindOutput(&_outputPipe);
-//	setNonBlocking(_inputPipe.receiver());
-//	setNonBlocking(_outputPipe.emitter());
+	_demux = new Demux(this, _outputPipe.emitter());
 }
 
 Conduit::~Conduit()
 {
+	delete _demux;
 }
 
 void
@@ -49,14 +56,34 @@ Conduit::processPipeEvents(void)
 
 	tracef("Conduit::processPipeEvents()\n");
 	FD_ZERO(&set);
-	FD_SET(_outputPipe.emitter(), &set);
-	select(_outputPipe.emitter() + 1, &set, NULL, NULL, NULL);
+	_demux->addSet(&set);
+	select(FD_SETSIZE, &set, NULL, NULL, NULL);
 	debugf("Conduit: select() returned\n");
-	if(FD_ISSET(_outputPipe.emitter(), &set))
+	_demux->processSet(&set);
+}
+
+void
+Conduit::packetRead(Socket *socket, Packet *packet)
+{
+	(void) socket;
+	(void) packet;
+
+	tracef("Conduit::packetRead()\n");
+	switch(packet->type())
 	{
-		debugf("Conduit: activity on pipe receiver!\n");
-		
+		case Packet::PKT_PAYLOAD:
+			processPayload(static_cast<PayloadPacket *>(packet));
+			break;
+		default:
+			diagf(DIAG_WARNING, "unsupported packet type %d\n", (int) packet->type());
 	}
+}
+
+void
+Conduit::processPayload(PayloadPacket *payload)
+{
+	tracef("Conduit::processPayload()\n");
+	dump(payload->buffer(), payload->size());
 }
 
 int

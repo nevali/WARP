@@ -3,6 +3,8 @@
 #endif
 
 #include <cstdio>
+#include <cerrno>
+
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
@@ -13,16 +15,47 @@ using namespace WARP;
 
 Socket::Socket(SocketDelegate *delegate, int fd):
 	_fd(fd),
-	_delegate(delegate)
+	_socketDelegate(delegate)
 {
+	if(_socketDelegate && _fd >= 0)
+	{
+		_socketDelegate->socketOpened(this);
+	}
 }
 
 Socket::~Socket()
 {
+	close();
 	if(_fd >= 0)
 	{
 		::close(_fd);
 	}
+}
+
+int
+Socket::close(void)
+{
+	int r;
+
+	if(_fd < 0)
+	{
+		return 0;
+	}
+	do
+	{
+		r = ::close(_fd);
+	}
+	while(r == -1 && errno == EINTR);
+	if(r < 0)
+	{
+		return r;
+	}
+	if(_socketDelegate)
+	{
+		_socketDelegate->socketClosed(this);
+	}
+	_fd = -1;
+	return 0;
 }
 
 void
@@ -39,15 +72,15 @@ Socket::processSet(fd_set *fds)
 {
 	if(_fd >= 0 && FD_ISSET(_fd, fds))
 	{
-		if(_delegate)
+		if(_socketDelegate)
 		{
-			_delegate->socketActivity(this);
+			_socketDelegate->socketActivity(this);
 		}
 	}
 }
 
 int
-Socket::id(void)
+Socket::id(void) const
 {
 	return _fd;
 }

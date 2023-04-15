@@ -11,12 +11,13 @@
 #include "WARP/Core/Diagnostics.hh"
 
 #include "WARP/Mux.hh"
+#include "WARP/Packets.hh"
 
 using namespace WARP;
 
 Mux::Mux(MuxDelegate *delegate):
 	Listener(delegate),
-	_delegate(delegate),
+	_muxDelegate(delegate),
 	_writeBuf()
 {
 	_fd = STDOUT_FILENO;
@@ -36,18 +37,6 @@ Listener::Client *
 Mux::accept(void)
 {
 	return NULL;
-}
-
-
-/* Multiplex a payload packet */
-bool
-Mux::payload(int connection, const void *buf, size_t buflen)
-{
-	bool r;
-	Packet *packet = new PayloadPacket(connection, buf, buflen);
-	r = mux(packet);
-	delete packet;
-	return r;
 }
 
 /* Encode and multiplex a packet */
@@ -95,9 +84,53 @@ Mux::mux(Packet::Encoded *encoded)
 		size -= r;
 		ptr += r;
 	}
-	if(_delegate)
+	if(_muxDelegate)
 	{
-		_delegate->packetWritten(encoded);
+		_muxDelegate->packetWritten(encoded);
 	}
 	return true;
+}
+
+/* Create and multiplex an Ident packet */
+bool
+Mux::ident(unsigned version, const char *name)
+{
+	bool r;
+	Packet *packet = new Packets::Ident(version, name);
+	r = mux(packet);
+	delete packet;
+	return r;
+}
+
+/* Create and multiplex a Connection Opened packet */
+bool
+Mux::connectionOpened(int id)
+{
+	bool r;
+	Packet *packet = new Packets::ConnectionOpened(id);
+	r = mux(packet);
+	delete packet;
+	return r;
+}
+
+/* Create and multiplex a Connection Opened packet */
+bool
+Mux::connectionClosed(int id)
+{
+	bool r;
+	Packet *packet = new Packets::ConnectionClosed(id);
+	r = mux(packet);
+	delete packet;
+	return r;
+}
+
+/* Create and multiplex a Payload packet */
+bool
+Mux::payload(int connection, const void *buf, size_t buflen)
+{
+	bool r;
+	Packet *packet = new Packets::Payload(connection, buf, buflen);
+	r = mux(packet);
+	delete packet;
+	return r;
 }

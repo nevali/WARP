@@ -61,9 +61,31 @@ MuxProxy::~MuxProxy()
 }
 
 void
+MuxProxy::socketOpened(Socket *socket)
+{
+	debugf("MuxProxy: new connection #%d established\n", socket->id());
+	if(!_mux->connectionOpened(socket->id()))
+	{
+		debugf("MuxProxy: failed to mux new connection\n");
+		/* XXX */
+	}
+}
+
+void
+MuxProxy::socketClosed(Socket *socket)
+{
+	debugf("MuxProxy: connection #%d closed\n", socket->id());
+	if(!_mux->connectionClosed(socket->id()))
+	{
+		debugf("MuxProxy: failed to mux closed connection\n");
+		/* XXX */
+	}
+}
+
+void
 MuxProxy::socketReadBuffer(Socket *socket, const void *buf, size_t buflen)
 {
-	debugf("MuxProxy: read %lu bytes from socket\n", (unsigned long) buflen);
+	debugf("MuxProxy: read %lu bytes from socket #%d\n", (unsigned long) buflen, socket->id());
 	if(!_mux->payload(socket->id(), buf, buflen))
 	{
 		debugf("MuxProxy: failed to mux payload\n");

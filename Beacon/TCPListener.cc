@@ -97,13 +97,13 @@ TCPListener::accept(void)
 	if(sin.sin_family != AF_INET)
 	{
 		debugf("TCPListener::accept: sin_family != AF_INET?\n");
-		close(clientfd);
+		::close(clientfd);
 		return NULL;
 	}
 	if(sinlen != sizeof(struct sockaddr_in))
 	{
 		debugf("TCPListener::accept: sinlen != struct(sockaddr_in)\n");
-		close(clientfd);
+		::close(clientfd);
 		return NULL;
 	}
 	client = new TCPClient(this, clientfd, &sin, sinlen);

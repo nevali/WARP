@@ -68,7 +68,7 @@ Listener::remove(Client *client)
 }
 
 Listener::Client::Client(Listener *listener, int fd, Buffer *readBuf):
-	Socket(listener->_delegate, fd),
+	Socket(listener->_socketDelegate, fd),
 	_listener(listener),
 	_readBuf(readBuf)
 {
@@ -93,28 +93,29 @@ Listener::Client::processSet(fd_set *fds)
 	 */
 	(void) fds;
 
-	if(_delegate)
+	tracef("Listener::Client::processSet(#%d)\n", _fd);
+	if(_socketDelegate)
 	{
-		_delegate->socketActivity(this);
+		_socketDelegate->socketActivity(this);
 	}
+	len = 0;
 	if(::ioctl(_fd, FIONREAD, &len) < 0)
 	{
 		/* XXX EINTR */
-		debugf("ioctl() failed on connection #%d\n", _fd);
+		debugf("Listener::Client: ioctl() failed on connection #%d\n", _fd);
 		return;
 	}
 	if(len <= 0)
 	{
-		debugf("len = %d\n", len);
-		close(_fd);
-		_fd = -1;
+		debugf("Listener::Client: len = %d\n", len);
+		close();
 		return;
 	}
 	if((size_t) len > _readBuf->size())
 	{
 		len = _readBuf->size();
 	}
-	debugf("Listener::Client: reading %d bytes to read on connection #%d\n", len, _fd);
+	debugf("Listener::Client: reading %d bytes from connection #%d\n", len, _fd);
 	do
 	{
 		r = ::recv(_fd, _readBuf->base(), len, MSG_WAITALL);
@@ -128,9 +129,9 @@ Listener::Client::processSet(fd_set *fds)
 		return;
 	}
 	debugf("Listener::Client: read %ld bytes from connection #%d\n", (long) r, _fd);
-	if(_delegate)
+	if(_socketDelegate)
 	{
-		_delegate->socketReadBuffer(this, _readBuf->base(), r);
+		_socketDelegate->socketReadBuffer(this, _readBuf->base(), r);
 	}
 }
 

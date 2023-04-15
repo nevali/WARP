@@ -18,11 +18,14 @@ namespace WARP
 		friend class SocketSet;
 	protected:
 		int _fd;
-		SocketDelegate *_delegate;
+		SocketDelegate *_socketDelegate;
 	public:
 		virtual void addSet(fd_set *set);
 		virtual void processSet(fd_set *set);
-		virtual int id(void);
+	public:
+		virtual int id(void) const;
+	protected:
+		virtual int close(void);
 	};
 }
 

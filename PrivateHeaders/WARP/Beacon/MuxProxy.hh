@@ -20,6 +20,8 @@ namespace WARP
 			public:
 			public:
 				/* SocketDelegate */
+				virtual void socketOpened(Socket *socket);
+				virtual void socketClosed(Socket *socket);
 				virtual void socketReadBuffer(Socket *socket, const void *buf, size_t buflen);
 				/* MuxDelegate */
 				virtual void packetRead(Socket *socket, Packet *packet);

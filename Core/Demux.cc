@@ -16,7 +16,7 @@ using namespace WARP;
 
 Demux::Demux(MuxDelegate *delegate, int fd):
 	Listener(delegate),
-	_delegate(delegate)
+	_muxDelegate(delegate)
 {
 	int flags;
 
@@ -43,9 +43,9 @@ Demux::processSet(fd_set *set)
 	tracef("Demux: processing started\n");
 	if(FD_ISSET(_fd, set))
 	{
-		if(_delegate)
+		if(_socketDelegate)
 		{
-			_delegate->socketActivity(this);
+			_socketDelegate->socketActivity(this);
 		}
 		do
 		{
@@ -99,6 +99,9 @@ Demux::supportedPacketType(Packet::Type type)
 {
 	switch(type)
 	{
+		case Packet::PKT_IDENT:
+		case Packet::PKT_OPEN:
+		case Packet::PKT_CLOSE:
 		case Packet::PKT_PAYLOAD:
 			return true;
 		default:
@@ -131,9 +134,9 @@ Demux::socketReadBuffer(Socket *socket, const void *buf, size_t buflen)
 		debugf("Demux: failed to decode packet\n");
 		return;
 	}
-	if(_delegate)
+	if(_muxDelegate)
 	{
-		_delegate->packetRead(socket, packet);
+		_muxDelegate->packetRead(socket, packet);
 	}
 	delete packet;
 }

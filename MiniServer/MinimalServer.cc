@@ -11,6 +11,7 @@
 
 #include "WARP/SubTask.hh"
 #include "WARP/Packet.hh"
+#include "WARP/Packets.hh"
 #include "WARP/Demux.hh"
 
 namespace WARP
@@ -22,7 +23,7 @@ namespace WARP
 			virtual ~Conduit();
 		protected:
 			virtual void processPipeEvents(void);
-			virtual void processPayload(PayloadPacket *payload);
+			virtual void processPayload(Packets::Payload *payload);
 		protected:
 			/* MuxDelegate */
 			virtual void packetRead(Socket *socket, Packet *packet);
@@ -72,18 +73,20 @@ Conduit::packetRead(Socket *socket, Packet *packet)
 	switch(packet->type())
 	{
 		case Packet::PKT_PAYLOAD:
-			processPayload(static_cast<PayloadPacket *>(packet));
+			processPayload(static_cast<Packets::Payload *>(packet));
 			break;
 		default:
-			diagf(DIAG_WARNING, "unsupported packet type %d\n", (int) packet->type());
+			diagf(DIAG_WARNING, "Conduit: unsupported packet type %d\n", (int) packet->type());
 	}
 }
 
 void
-Conduit::processPayload(PayloadPacket *payload)
+Conduit::processPayload(Packets::Payload *payload)
 {
-	tracef("Conduit::processPayload()\n");
+	tracef("Conduit::processPayload(#%d, [%lu bytes])\n", payload->connection(), payload->size());
+	debugf("---------------------------------------------------------------------\n");
 	dump(payload->buffer(), payload->size());
+	debugf("---------------------------------------------------------------------\n");
 }
 
 int

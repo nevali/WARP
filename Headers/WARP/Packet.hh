@@ -14,7 +14,10 @@ namespace WARP
 			{
 				PKT_INVALID,
 				PKT_IDENT,
-				PKT_PAYLOAD
+				PKT_OPEN,
+				PKT_CLOSE,
+				PKT_PAYLOAD,
+				PKT_LISTEN
 			} Type;
 
 			/* The "wire format" between the Beacon and a server application
@@ -44,6 +47,14 @@ namespace WARP
 					{
 						/* this implies a limit of 65536 multiplexed connections */
 						uint16_t socket;
+					} open;
+					struct
+					{
+						uint16_t socket;
+					} closed;
+					struct
+					{
+						uint16_t socket;
 						uint8_t data[];
 					} payload;
 				};
@@ -70,20 +81,6 @@ namespace WARP
 		protected:
 			Type _type;
 			static uint16_t _nextSeq;
-	};
-
-	class PayloadPacket: public Packet
-	{
-		public:
-			PayloadPacket(int connection, const void *buf, size_t buflen):
-				Packet(PKT_PAYLOAD), _conn(connection), _buf(buf), _buflen(buflen) {}
-			virtual Encoded *encode(void *buf, size_t bufsize);
-			virtual const uint8_t *buffer(void) const;
-			virtual size_t size(void) const;
-		protected:
-			int _conn;
-			const void *_buf;
-			size_t _buflen;
 	};
 }
 

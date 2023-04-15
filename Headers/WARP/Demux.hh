@@ -20,7 +20,7 @@ namespace WARP
 			virtual Client *accept(void);
 			virtual bool supportedPacketType(Packet::Type type);
 		protected:
-			MuxDelegate *_delegate;
+			MuxDelegate *_muxDelegate;
 	};
 }
 

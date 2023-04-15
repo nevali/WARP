@@ -16,11 +16,15 @@ namespace WARP
 			virtual void addSet(fd_set *fds);
 			virtual bool mux(Packet *packet);
 			virtual bool mux(Packet::Encoded *encoded);
+		public:
+			virtual bool ident(unsigned version, const char *name);
+			virtual bool connectionOpened(int id);
+			virtual bool connectionClosed(int id);
 			virtual bool payload(int connection, const void *buf, size_t buflen);
 		protected:
 			virtual Client *accept(void);
 		protected:
-			MuxDelegate *_delegate;
+			MuxDelegate *_muxDelegate;
 			Buffer _writeBuf;
 	};
 }

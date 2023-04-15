@@ -17,6 +17,7 @@
 		"typeinfo": "cpp",
 		"*.inc": "cpp",
 		"*.idl": "cpp",
-		"cstring": "cpp"
+		"cstring": "cpp",
+		"cstdint": "cpp"
 	}
 }

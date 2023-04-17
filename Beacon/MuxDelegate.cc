@@ -6,13 +6,16 @@
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/MuxDelegate.hh"
+#include "WARP/Beacon/MuxDelegate.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 void
-MuxDelegate::packetRead(Socket *socket, Packet *packet)
+MuxDelegate::packetRead(Object *sender, Socket *socket, Packet *packet)
 {
+	(void) sender;
 	(void) socket;
 	(void) packet;
 
@@ -20,8 +23,9 @@ MuxDelegate::packetRead(Socket *socket, Packet *packet)
 }
 
 void
-MuxDelegate::packetWritten(Packet::Encoded *encoded)
+MuxDelegate::packetWritten(Object *sender, Packet::Encoded *encoded)
 {
+	(void) sender;
 	(void) encoded;
 
 	debugf("MuxDelegate: written a packet to the pipe\n");

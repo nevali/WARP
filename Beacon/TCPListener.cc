@@ -14,6 +14,7 @@
 #include "WARP/Beacon/TCPListener.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
 using namespace WARP::Beacon;
 
 TCPListener::TCPListener(SocketDelegate *delegate, uint32_t addr, uint16_t port):

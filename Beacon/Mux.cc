@@ -4,16 +4,19 @@
 
 #include <cstdio>
 #include <cerrno>
+#include <cstring>
 
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Mux.hh"
-#include "WARP/Packets.hh"
+#include "WARP/Beacon/Mux.hh"
+#include "WARP/Beacon/Packets.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 Mux::Mux(MuxDelegate *delegate):
 	Listener(delegate),
@@ -86,7 +89,7 @@ Mux::mux(Packet::Encoded *encoded)
 	}
 	if(_muxDelegate)
 	{
-		_muxDelegate->packetWritten(encoded);
+		_muxDelegate->packetWritten(this, encoded);
 	}
 	return true;
 }

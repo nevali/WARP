@@ -8,18 +8,18 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/Socket.hh"
 
-#include "WARP/Socket.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 Socket::Socket(SocketDelegate *delegate, int fd):
+	Object(),
 	_fd(fd),
 	_socketDelegate(delegate)
 {
 	if(_socketDelegate && _fd >= 0)
 	{
-		_socketDelegate->socketOpened(this);
+		_socketDelegate->socketOpened(this, this);
 	}
 }
 
@@ -52,7 +52,7 @@ Socket::close(void)
 	}
 	if(_socketDelegate)
 	{
-		_socketDelegate->socketClosed(this);
+		_socketDelegate->socketClosed(this, this);
 	}
 	_fd = -1;
 	return 0;
@@ -74,7 +74,7 @@ Socket::processSet(fd_set *fds)
 	{
 		if(_socketDelegate)
 		{
-			_socketDelegate->socketActivity(this);
+			_socketDelegate->socketActivity(this, this);
 		}
 	}
 }

@@ -10,12 +10,12 @@
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Packet.hh"
-
+#include "WARP/Beacon/Packet.hh"
 #include "WARP/Beacon/MuxProxy.hh"
 #include "WARP/Beacon/DebugMux.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
 using namespace WARP::Beacon;
 
 MuxProxy::MuxProxy():

@@ -4,15 +4,18 @@
 
 #include <cstdio>
 #include <cerrno>
+#include <cstring>
 
 #include <fcntl.h>
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Demux.hh"
+#include "WARP/Beacon/Demux.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 Demux::Demux(MuxDelegate *delegate, int fd):
 	Listener(delegate),
@@ -45,7 +48,7 @@ Demux::processSet(fd_set *set)
 	{
 		if(_socketDelegate)
 		{
-			_socketDelegate->socketActivity(this);
+			_socketDelegate->socketActivity(this, this);
 		}
 		do
 		{
@@ -136,7 +139,7 @@ Demux::socketReadBuffer(Socket *socket, const void *buf, size_t buflen)
 	}
 	if(_muxDelegate)
 	{
-		_muxDelegate->packetRead(socket, packet);
+		_muxDelegate->packetRead(socket, socket, packet);
 	}
 	delete packet;
 }

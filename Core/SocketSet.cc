@@ -6,11 +6,10 @@
 #include <cstdlib>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/SocketSet.hh"
+#include "WARP/Core/Socket.hh"
 
-#include "WARP/SocketSet.hh"
-#include "WARP/Socket.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 SocketSet::SocketSet():
 	_clients(NULL),

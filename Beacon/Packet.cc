@@ -10,10 +10,11 @@
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Packet.hh"
-#include "WARP/Packets.hh"
+#include "WARP/Beacon/Packet.hh"
+#include "WARP/Beacon/Packets.hh"
 
-using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 uint16_t Packet::_nextSeq = 0;
 

@@ -11,11 +11,9 @@
 #include <sys/ioctl.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/Listener.hh"
 
-#include "WARP/Listener.hh"
-#include "WARP/Packet.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 Listener::Listener(SocketDelegate *delegate):
 	Socket(delegate),
@@ -67,8 +65,8 @@ Listener::remove(Client *client)
 	_clients.add(client);
 }
 
-Listener::Client::Client(Listener *listener, int fd, Buffer *readBuf):
-	Socket(listener->_socketDelegate, fd),
+Listener::Client::Client(Listener *listener, int fd, SocketBuffer *readBuf):
+	Socket(_readBuf, fd),
 	_listener(listener),
 	_readBuf(readBuf)
 {
@@ -85,9 +83,6 @@ Listener::Client::~Client()
 void
 Listener::Client::processSet(fd_set *fds)
 {
-	int len;
-	ssize_t r;
-
 	/* we don't need to check fds because the Listener has already done
 	 * that for us
 	 */
@@ -96,42 +91,7 @@ Listener::Client::processSet(fd_set *fds)
 	tracef("Listener::Client::processSet(#%d)\n", _fd);
 	if(_socketDelegate)
 	{
-		_socketDelegate->socketActivity(this);
-	}
-	len = 0;
-	if(::ioctl(_fd, FIONREAD, &len) < 0)
-	{
-		/* XXX EINTR */
-		debugf("Listener::Client: ioctl() failed on connection #%d\n", _fd);
-		return;
-	}
-	if(len <= 0)
-	{
-		debugf("Listener::Client: len = %d\n", len);
-		close();
-		return;
-	}
-	if((size_t) len > _readBuf->size())
-	{
-		len = _readBuf->size();
-	}
-	debugf("Listener::Client: reading %d bytes from connection #%d\n", len, _fd);
-	do
-	{
-		r = ::recv(_fd, _readBuf->base(), len, MSG_WAITALL);
-	}
-	while(r == -1 && errno == EINTR);
-	if(r == -1)
-	{
-		debugf("Listener::Client: recv failed on connection #%d: %s\n", _fd, strerror(errno));
-		::close(_fd);
-		_fd = -1;
-		return;
-	}
-	debugf("Listener::Client: read %ld bytes from connection #%d\n", (long) r, _fd);
-	if(_socketDelegate)
-	{
-		_socketDelegate->socketReadBuffer(this, _readBuf->base(), r);
+		_socketDelegate->socketActivity(this, this);
 	}
 }
 

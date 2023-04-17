@@ -1,8 +1,8 @@
-#ifndef BEACON_DEBUGMUX_HH_
-# define BEACON_DEBUGMUX_HH_
+#ifndef WARP_BEACON_DEBUGMUX_HH_
+# define WARP_BEACON_DEBUGMUX_HH_
 
-# include "WARP/Mux.hh"
-# include "WARP/Demux.hh"
+# include "WARP/Beacon/Mux.hh"
+# include "WARP/Beacon/Demux.hh"
 
 namespace WARP
 {
@@ -26,4 +26,4 @@ namespace WARP
 	}
 }
 
-#endif /*!BEACON_DEBUGMUX_HH_*/
+#endif /*!WARP_BEACON_DEBUGMUX_HH_*/

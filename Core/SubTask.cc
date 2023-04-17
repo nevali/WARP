@@ -12,11 +12,10 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/SubTask.hh"
+#include "WARP/Core/Pipe.hh"
 
-#include "WARP/Pipe.hh"
-#include "WARP/SubTask.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 SubTask::SubTask():
 	_name(NULL),
@@ -65,15 +64,13 @@ SubTask::processChildEvents(void)
 	pid_t r;
 	int status;
 	
-	if(_pid < 2)
+	if(_pid < 1)
 	{
 		return;
 	}
-	/* XXX waitpid */
-	
 	do
 	{
-		r = ::waitpid(_pid, &status, 0);
+		r = ::waitpid(_pid, &status, WNOHANG);
 		debugf("SubTask: waitpid: r = %d, status = %d, errno = %d (%s)\n", (int) r, status, errno, strerror(errno));
 	}
 	while(r == -1 && errno == EINTR);
@@ -88,7 +85,10 @@ SubTask::processChildEvents(void)
 		perror("waitpid");
 		exit(EXIT_FAILURE);
 	}
-	childWasSignalled(r, status);
+	if(r > 0)
+	{
+		childWasSignalled(r, status);
+	}
 }
 
 int

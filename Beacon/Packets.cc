@@ -10,9 +10,10 @@
 
 #include "WARP/Core/Diagnostics.hh"
 
-#include "WARP/Packets.hh"
+#include "WARP/Beacon/Packets.hh"
 
-using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 Packet::Encoded *
 Packets::Ident::encode(void *buf, size_t bufsize)

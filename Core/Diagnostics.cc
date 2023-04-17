@@ -11,10 +11,9 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/Buffer.hh"
 
-#include "WARP/Buffer.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 #define DUMPWIDTH 16
 
@@ -39,7 +38,7 @@ static DiagnosticLevel diagLevel = DIAG_TRACE;
 
 
 void
-WARP::diag(DiagnosticLevel level, const char *str)
+WARP::Core::diag(DiagnosticLevel level, const char *str)
 {
 	size_t size;
 	char *ptr;
@@ -59,7 +58,7 @@ WARP::diag(DiagnosticLevel level, const char *str)
 }
 
 void
-WARP::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
+WARP::Core::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
 {
 	size_t size;
 	char *ptr;
@@ -80,32 +79,32 @@ WARP::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
 }
 
 void
-WARP::diagf(DiagnosticLevel level, const char *format, ...)
+WARP::Core::diagf(DiagnosticLevel level, const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::vdiagf(level, format, ap);
+	WARP::Core::vdiagf(level, format, ap);
 	va_end(ap);
 }
 
 void
-WARP::debugf(const char *format, ...)
+WARP::Core::debugf(const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::vdiagf(DIAG_DEBUG, format, ap);
+	WARP::Core::vdiagf(DIAG_DEBUG, format, ap);
 	va_end(ap);
 }
 
 void
-WARP::tracef(const char *format, ...)
+WARP::Core::tracef(const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::vdiagf(DIAG_TRACE, format, ap);
+	WARP::Core::vdiagf(DIAG_TRACE, format, ap);
 	va_end(ap);
 }
 
@@ -119,7 +118,7 @@ WARP::tracef(const char *format, ...)
  *
  */
 void
-WARP::dump(const uint8_t *base, size_t length, size_t baseaddr)
+WARP::Core::dump(const uint8_t *base, size_t length, size_t baseaddr)
 {
 	ADDR offset;
 	

@@ -9,10 +9,9 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/Server.hh"
 
-#include "WARP/Server.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 Server::Server():
 	_listeners()

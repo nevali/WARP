@@ -8,49 +8,57 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/SubTask.hh"
 
-#include "WARP/SubTask.hh"
-#include "WARP/Packet.hh"
-#include "WARP/Packets.hh"
-#include "WARP/Demux.hh"
+#include "WARP/Beacon/Packet.hh"
+#include "WARP/Beacon/Packets.hh"
+#include "WARP/Beacon/Demux.hh"
 
 namespace WARP
 {
-	class Conduit: public SubTask, public MuxDelegate
+	namespace Beacon
 	{
-		public:
-			Conduit();
-			virtual ~Conduit();
-		protected:
-			virtual void processPipeEvents(void);
-			virtual void processIdent(Packets::Ident *packet);
-			virtual void processConnectionOpened(Packets::ConnectionOpened *packet);
-			virtual void processConnectionClosed(Packets::ConnectionClosed *packet);
-			virtual void processPayload(Packets::Payload *packet);
-		protected:
-			/* MuxDelegate */
-			virtual void packetRead(Socket *socket, Packet *packet);
-		protected:
-			Pipe _inputPipe;
-			Pipe _outputPipe;
-			Demux *_demux;
-	};
+		class Conduit: public Core::SubTask, public MuxDelegate
+		{
+			public:
+				Conduit();
+				virtual ~Conduit();
+			protected:
+				virtual void processPipeEvents(void);
+				virtual void processIdent(Packets::Ident *packet);
+				virtual void processConnectionOpened(Packets::ConnectionOpened *packet);
+				virtual void processConnectionClosed(Packets::ConnectionClosed *packet);
+				virtual void processPayload(Packets::Payload *packet);
+			protected:
+				/* MuxDelegate */
+				virtual void packetRead(Core::Object *sender, Core::Socket *socket, Packet *packet);
+			protected:
+				Core::Pipe *_inputPipe;
+				Core::Pipe *_outputPipe;
+				Demux *_demux;
+		};
+	}
 }
 
-using namespace WARP;
+using namespace WARP::Core;
+using namespace WARP::Beacon;
 
 Conduit::Conduit():
 	SubTask(),
 	_demux(NULL)
 {
-	bindInput(&_inputPipe);
-	bindOutput(&_outputPipe);
-	_demux = new Demux(this, _outputPipe.emitter());
+	_inputPipe = new Pipe();
+	bindInput(_inputPipe);
+	_outputPipe = new Pipe();
+	bindOutput(_outputPipe);
+	_demux = new Demux(this, _outputPipe->emitter());
 }
 
 Conduit::~Conduit()
 {
 	delete _demux;
+	_outputPipe->release();
+	_inputPipe->release();
 }
 
 void
@@ -67,8 +75,9 @@ Conduit::processPipeEvents(void)
 }
 
 void
-Conduit::packetRead(Socket *socket, Packet *packet)
+Conduit::packetRead(Object *sender, Socket *socket, Packet *packet)
 {
+	(void) sender;
 	(void) socket;
 	(void) packet;
 
@@ -124,7 +133,7 @@ Conduit::processPayload(Packets::Payload *packet)
 int
 main(int argc, char **argv)
 {
-	Conduit c;
+	WARP::Beacon::Conduit c;
 
 	(void) argc;
 	(void) argv;

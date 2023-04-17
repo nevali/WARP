@@ -13,10 +13,9 @@
 #include <unistd.h>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/Pipe.hh"
 
-#include "WARP/Pipe.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 static bool
 setCloseOnExec(int fd)
@@ -38,7 +37,6 @@ setCloseOnExec(int fd)
 	}
 	return true;
 }
-
 
 Pipe::Pipe()
 {

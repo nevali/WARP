@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cerrno>
+#include <cstring>
 
 #include "WARP/Core/Diagnostics.hh"
 
@@ -11,6 +12,7 @@
 #include "WARP/Beacon/TCPListener.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
 using namespace WARP::Beacon;
 
 int

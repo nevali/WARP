@@ -6,10 +6,10 @@
 #include <cerrno>
 
 #include "WARP/Core/Diagnostics.hh"
-
 #include "WARP/Beacon/DebugMux.hh"
 
 using namespace WARP;
+using namespace WARP::Core;
 using namespace WARP::Beacon;
 
 DebugMux::DebugMux(MuxDelegate *delegate):

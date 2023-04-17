@@ -6,37 +6,36 @@
 #include <cstdlib>
 
 #include "WARP/Core/Diagnostics.hh"
+#include "WARP/Core/SocketDelegate.hh"
+#include "WARP/Core/Socket.hh"
 
-#include "WARP/SocketDelegate.hh"
-#include "WARP/Socket.hh"
-
-using namespace WARP;
+using namespace WARP::Core;
 
 void
-SocketDelegate::socketOpened(Socket *socket)
+SocketDelegate::socketOpened(Object *sender, Socket *socket)
 {
 	tracef("SocketDelegate: socket #%d opened\n", socket->id());
 }
 
 void
-SocketDelegate::socketClosed(Socket *socket)
+SocketDelegate::socketClosed(Object *sender, Socket *socket)
 {
 	tracef("SocketDelegate: socket #%d closed\n", socket->id());
 }
 
 /* Invoked when there's activity on a socket (client or listener) */
 void
-SocketDelegate::socketActivity(Socket *socket)
+SocketDelegate::socketActivity(Object *sender, Socket *socket)
 {
 	tracef("SocketDelegate: activity on socket #%d\n", socket->id());
 }
 
 /* Invoked when data has been read from a socket */
 void
-SocketDelegate::socketReadBuffer(Socket *socket, const void *buf, size_t buflen)
+SocketDelegate::socketReadBuffer(Object *sender, Socket *socket, const void *buf, size_t *buflen)
 {
 	(void) socket;
 	(void) buf;
 
-	tracef("SocketDelegate: read %lu bytes from socket #%d\n", (unsigned long) buflen, socket->id());
+	tracef("SocketDelegate: read %lu bytes from socket #%d\n", (unsigned long) *buflen, socket->id());
 }

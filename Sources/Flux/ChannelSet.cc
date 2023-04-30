@@ -5,11 +5,57 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <sys/types.h>
+#include <sys/select.h>
+
 #include "WARP/Flux/Diagnostics.hh"
 #include "WARP/Flux/ChannelSet.hh"
 #include "WARP/Flux/Channel.hh"
 
 using namespace WARP::Flux;
+
+ChannelSet::ChannelSet():
+	TArray<Channel>()
+{
+}
+
+ChannelSet::~ChannelSet()
+{
+}
+
+unsigned
+ChannelSet::retain()
+{
+	return TArray<Channel>::retain();
+}
+
+unsigned
+ChannelSet::release()
+{
+	return TArray<Channel>::release();
+}
+
+Object::Kind
+ChannelSet::kind(void) const
+{
+	return CHANNELSET;
+}
+
+void
+ChannelSet::processEventsWithTimeout(struct timeval *tv)
+{
+	::select(0, NULL, NULL, NULL, tv);
+}
+
+void
+ChannelSet::processPendingEvents(void)
+{
+	struct timeval tv;
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	processEventsWithTimeout(&tv);
+}
 
 #if BROKEN
 

@@ -30,6 +30,12 @@ RunLoop::~RunLoop()
 	_sources->release();
 }
 
+Object::Kind
+RunLoop::kind(void) const
+{
+	return RUNLOOP;
+}
+
 void
 RunLoop::add(EventSource *eventSource)
 {
@@ -58,7 +64,6 @@ RunLoop::processEventsWithTimeout(struct timeval *tv)
 		::select(FD_SETSIZE, &fds, NULL, NULL, tv);
 		_listeners.processSet(&fds); */
 	_channels->processEventsWithTimeout(tv);
-	_channels->processPendingEvents();
 // 	foreach(_sources) ...	_sources->processPendingEvents();
 }
 

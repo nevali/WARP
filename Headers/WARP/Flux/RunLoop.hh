@@ -26,7 +26,7 @@ namespace WARP
 				virtual ~RunLoop();
 			public:
 				virtual Kind kind(void) const;
-				virtual int run(void);
+			public:
 				/* note that this is a polymorphic interface but different types
 				 * of object process events differently, and this behaviour is
 				 * somewhat baked into the implementation of WARP::Flux::RunLoop

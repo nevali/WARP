@@ -11,7 +11,7 @@ namespace WARP
 	{
 		/* a ChannelSet is an array of Channels which is also an
 		 * EventSource and implements the processEventsWithTimeout()
-		 * method
+		 * method to integrate with a RunLoop
 		 */
 		class ChannelSet: public TArray<Channel>, virtual protected EventSource
 		{

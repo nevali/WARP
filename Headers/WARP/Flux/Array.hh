@@ -29,6 +29,7 @@ namespace WARP
 					virtual size_t addPointer(void *ptr);
 					virtual bool removePointer(void *ptr);
 					virtual void pointerWasRemoved(void *ptr) const;
+					virtual void forEachPointer(bool (*callback)(void *ptr, void *ctx), void *ctx);
 				private:
 					ArrayData *_data;
 			};
@@ -46,18 +47,19 @@ namespace WARP
 					}
 
 				public:
-					void add(T *object)
+					size_t add(T *object)
 					{
 						if(object && indexOfObject(object) == NOTFOUND)
 						{
 							object->retain();
-							Array::addPointer(object);
+							return Array::addPointer(object);
 						}
+						return NOTFOUND;
 					}
 
-					void remove(T *object)
+					bool remove(T *object)
 					{
-						Array::removePointer(object);
+						return Array::removePointer(object);
 					}
 
 					size_t indexOfObject(T *object)

@@ -11,6 +11,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#if BROKEN
+
 #include "WARP/Flux/Diagnostics.hh"
 #include "WARP/Flux/ChannelBuffer.hh"
 #include "WARP/Flux/Channel.hh"
@@ -34,6 +36,8 @@ ChannelBuffer::channelActivity(Object *sender, Channel *channel)
 	size_t size;
 	ssize_t r;
 
+	(void) sender;
+	
 	fd = channel->descriptor();
 	tracef("ChannelBuffer::channelActivity(): activity on channel #%d\n", fd);
 	len = 0;
@@ -58,6 +62,7 @@ ChannelBuffer::channelActivity(Object *sender, Channel *channel)
 	debugf("ChannelBuffer::channelActivity: reading %d bytes from connection #%d\n", len, fd);
 	do
 	{
+		/* XXX do we really want MSG_WAITALL here?? */
 		r = ::recv(fd, writePointer(), len, MSG_WAITALL);
 	}
 	while(r == -1 && (errno == EINTR || errno == EAGAIN));
@@ -70,3 +75,5 @@ ChannelBuffer::channelActivity(Object *sender, Channel *channel)
 	debugf("ChannelBuffer::channelActivity: read %ld bytes from connection #%d\n", (long) r, fd);
 	advanceWrite(r);
 }
+
+#endif

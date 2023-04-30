@@ -129,6 +129,20 @@ Array::pointerWasRemoved(void *ptr) const
 }
 
 void
+Array::forEachPointer(bool (*callback)(void *ptr, void *ctx), void *ctx)
+{
+	size_t index;
+
+	for(index = 0; index < _data->size; index++)
+	{
+		if(_data->ptr[index])
+		{
+			callback(_data->ptr[index], ctx);
+		}
+	}
+}
+
+void
 ArrayData::expand(void)
 {
 	void **p;

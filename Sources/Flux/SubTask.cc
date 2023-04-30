@@ -123,7 +123,8 @@ SubTask::bindOutput(Pipe *pipe)
 bool
 SubTask::launch(void)
 {
-	char * const argv[] = { "Beacon/warp-beacon", NULL };
+	char namebuf[32] = "Beacon/warp-beacon";
+	char * const argv[] = { namebuf, NULL };
 	const char *name = (_name ? _name : argv[0]);
 
 	assert(_pid == 0);

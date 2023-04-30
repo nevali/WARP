@@ -94,7 +94,8 @@ Listener::Client::processSet(fd_set *fds)
 	tracef("Listener::Client::processSet(#%d)\n", descriptor());
 	if((delegate = channelDelegate()))
 	{
-		delegate->channelActivity(this, this);
+		/* XXX rewrite this */
+//		delegate->channelReadReady(this, this);
 	}
 }
 

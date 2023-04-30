@@ -14,28 +14,33 @@ using namespace WARP::Flux;
 void
 ChannelDelegate::channelOpened(Object *sender, Channel *channel)
 {
-	tracef("ChannelDelegate: channel #%d opened\n", channel->descriptor());
+	tracef("ChannelDelegate: Channel<%p>[#%d] opened (Sender = Object<%p>)\n", channel, channel->descriptor(), sender);
 }
 
 void
 ChannelDelegate::channelClosed(Object *sender, Channel *channel)
 {
-	tracef("ChannelDelegate: channel #%d closed\n", channel->descriptor());
+	tracef("ChannelDelegate: Channel<%p>[#%d] closed (Sender = Object<%p>)\n", channel, channel->descriptor(), sender);
 }
 
-/* Invoked when there's activity on a channel (client or listener) */
+/* Invoked when a Channel is ready to be read from */
 void
-ChannelDelegate::channelActivity(Object *sender, Channel *channel)
+ChannelDelegate::channelReadPending(Object *sender, Channel *channel)
 {
-	tracef("ChannelDelegate: activity on channel #%d\n", channel->descriptor());
+	tracef("ChannelDelegate: Channel<%p>[#%d] is ready for read (Sender = Object<%p>)\n", channel, channel->descriptor(), sender);
 }
 
-/* Invoked when data has been read from a channel */
+/* Invoked when a Channel is ready to be written to */
 void
-ChannelDelegate::channelReadBuffer(Object *sender, Channel *channel, const void *buf, size_t *buflen)
+ChannelDelegate::channelWriteReady(Object *sender, Channel *channel)
 {
-	(void) channel;
-	(void) buf;
+	tracef("ChannelDelegate: Channel<%p>[#%d] is ready for write (Sender = Object<%p>)\n", channel, channel->descriptor(), sender);
+}
 
-	tracef("ChannelDelegate: read %lu bytes from channel #%d\n", (unsigned long) *buflen, channel->descriptor());
+/* Invoked to check whether a Channel can receive data */
+bool
+ChannelDelegate::isChannelReadyToReceive(Object *sender, Channel *channel)
+{
+	tracef("ChannelDelegate: Channel<%p>[#%d] is ready to receive (Sender = Object<%p>)\n", channel, channel->descriptor(), sender);
+	return true;
 }

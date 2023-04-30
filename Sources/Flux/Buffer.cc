@@ -7,6 +7,8 @@
 
 #include "WARP/Flux/Diagnostics.hh"
 #include "WARP/Flux/Buffer.hh"
+#include "WARP/Flux/BufferDelegate.hh"
+#include "WARP/Flux/Channel.hh"
 
 using namespace WARP::Flux;
 
@@ -28,6 +30,12 @@ Buffer::~Buffer()
 	::free(_base);
 }
 
+Object::Kind
+Buffer::kind(void) const
+{
+	return BUFFER;
+}
+
 void
 Buffer::reset(void)
 {
@@ -39,8 +47,9 @@ Buffer::reset(void)
 bool
 Buffer::advanceRead(size_t bytes)
 {
-	if(_readPos + bytes < _size)
+	if(_readPos + bytes <= _size)
 	{
+		tracef("Buffer::advanceRead(): %lu bytes consumed from buffer\n", bytes);
 		_readPos += bytes;
 		return true;
 	}
@@ -50,8 +59,9 @@ Buffer::advanceRead(size_t bytes)
 bool
 Buffer::advanceWrite(size_t bytes)
 {
-	if(_writePos + bytes < _size)
+	if(_writePos + bytes  <= _size)
 	{
+		tracef("Buffer::advanceWrite(): %lu bytes appended to buffer\n", bytes);
 		_writePos += bytes;
 		return true;
 	}
@@ -97,10 +107,9 @@ Buffer::rewindWrite(void)
 }
 
 void
-Buffer::drain(void)
+Buffer::drain(Object *sender)
 {
 	size_t size, consumed;
-	char *ptr;
 
 	if(!_bufferDelegate)
 	{
@@ -108,25 +117,100 @@ Buffer::drain(void)
 		reset();
 		return;
 	}
+	tracef("Buffer::drain(): size=%lu, writePosition=%lu\n", _size, _writePos);
 	size = _writePos;
-	_readPos = 0;
-	do
+	rewindRead();
+	while(_readPos < _writePos)
 	{
 		consumed = size;
-		_bufferDelegate->bufferWritten(this, this, _base + _readPos, &consumed);
+		debugf("Buffer::drain(): readPosition=%lu, writePosition=%lu, size=%lu\n", _readPos, _writePos, consumed);
+		_bufferDelegate->bufferFilled(sender, this, _base + _readPos, &consumed);
 		if(consumed > size)
 		{
 			consumed = size;
 		}
+		advanceRead(consumed);
+		debugf("Buffer::drain(): %lu bytes were consumed by delegate\n", consumed);
 		if(!consumed)
 		{
 			break;
 		}
 		size -= consumed;
-		debugf("Buffer::drain(): advancing buffer by %lu bytes\n", consumed);
-		_readPos += consumed;
+		debugf("Buffer::drain(): advancing read cursor by %lu bytes\n", consumed);
 	}
-	while(size);
-	debugf("Buffer:drain: %lu bytes remain\n", size);
+	consume(_readPos);
+	debugf("Buffer::drain(): %lu bytes remain\n", size);
+}
+
+/* consume nbytes from the start of the buffer, moving whatever remains to
+ * the start of the buffer and updating the read and write positions
+ * accordingly
+ * 
+ * it's not possible to consume beyond the current write position
+ * if the read position is within the consumed region, it will be moved to the
+ * start
+ */
+void
+Buffer::consume(size_t nbytes)
+{
+	tracef("Buffer::consume(%lu) size=%lu, readPosition=%lu, writePosition=%lu\n", nbytes, _size, _readPos, _writePos);
+	if(nbytes > _writePos)
+	{
+		nbytes = _writePos;
+	}
+	if(!nbytes)
+	{
+		return;
+	}
+	memmove(_base, &_base[nbytes], _size - nbytes);
+	if(_readPos < nbytes)
+	{
+		_readPos = 0;
+	}
+	else
+	{
+		_readPos -= nbytes;
+	}
+	_writePos -= nbytes;
+	tracef("Buffer::consume(%lu) new readPosition=%lu, writePosition=%lu\n", nbytes, _readPos, _writePos);
+}
+
+/* ChannelDelegate */
+void
+Buffer::channelReadPending(Object *sender, Channel *channel)
+{
+	ssize_t l;
+
+	tracef("Buffer<%p>: Channel<%p>[#%d] is ready for read (Sender = Object<%p>)\n", this, channel, channel->descriptor(), sender);
+	while(channel->readPending() && remainingWrite())
+	{
+		l = channel->read(this);
+		debugf("Buffer::channelReadPending(): read => %ld\n", l);
+		if(l < 0)
+		{
+			break;
+		}
+		if(!remainingWrite() && _bufferDelegate)
+		{
+			debugf("Buffer::channelReadPending(): buffer is full, draining\n");
+			drain(sender);
+		}
+		debugf("Buffer::channelReadPending(): remainingWrite = %lu\n", remainingWrite());
+	}
+	if(writePosition() && _bufferDelegate)
+	{
+		debugf("Buffer::channelReadReady(): draining remainder of buffer\n");
+		drain(sender);
+	}
+}
+
+bool
+Buffer::isChannelReadyToReceive(Object *sender, Channel *channel)
+{
+	bool ready;
+
+	ready = remainingWrite() ? true : false;
+	tracef("Buffer<%p>: Channel<%p>[#%d] %s ready to receive (Sender = Object<%p>); remainingWrite = %lu\n", this, channel, channel->descriptor(), (ready ? " IS " : " IS NOT "), sender, remainingWrite());
+	return ready;
 
 }

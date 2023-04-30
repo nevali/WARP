@@ -8,7 +8,6 @@
 #  include "Channel.hh"
 #  include "ChannelSet.hh"
 #  include "ChannelDelegate.hh"
-#  include "ChannelBuffer.hh"
 #  include "Diagnostics.hh"
 #  include "EventSource.hh"
 #  include "Listener.hh"
@@ -17,6 +16,7 @@
 #  include "Socket.hh"
 #  include "SubTask.hh"
 #  include "RunLoop.hh"
+#  include "RunLoopDelegate.hh"
 //#  include "TCP4.hh"
 # endif
 

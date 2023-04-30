@@ -17,13 +17,12 @@ namespace WARP
 			virtual void channelOpened(Object *sender, Channel *channel);
 			/* Invoked when a channel has been closed */
 			virtual void channelClosed(Object *sender, Channel *channel);
-			/* Invoked when there is some kind of activity on a channel */
-			virtual void channelActivity(Object *sender, Channel *channel);
-			/* Invoked when data has been read from a channel; on return, *buflen
-			* should be set to the number of bytes from the buffer that were
-			* consumed
-			*/
-			virtual void channelReadBuffer(Object *sender, Channel *channel, const void *buf, size_t *buflen);
+			/* Invoked when the channel is ready to be read from (data is pending) */
+			virtual void channelReadPending(Object *sender, Channel *channel);
+			/* Invoked when the channel is ready to be written to (data has been flushed) */
+			virtual void channelWriteReady(Object *sender, Channel *channel);
+			/* Invoked to determine whether the channel is ready to receive data */
+			virtual bool isChannelReadyToReceive(Object *sender, Channel *channel);
 		};
 	}
 }

@@ -13,11 +13,13 @@
 #include "WARP/Flux/EventSource.hh"
 #include "WARP/Flux/Channel.hh"
 #include "WARP/Flux/SubTask.hh"
+#include "WARP/Flux/RunLoopDelegate.hh"
 
 using namespace WARP::Flux;
 
-RunLoop::RunLoop():
+RunLoop::RunLoop(RunLoopDelegate *delegate):
 	Object(),
+	_runLoopDelegate(delegate),
 	_terminated(false)
 {
 	_sources = new TArray<EventSource>();
@@ -45,10 +47,11 @@ RunLoop::add(EventSource *eventSource)
 	switch(eventSource->kind())
 	{
 		case CHANNEL:
+			tracef("RunLoop::add(): adding Channel<%p>\n", eventSource);
 			_channels->add(static_cast<Channel *>(eventSource));
 			break;
-		case CHANNELSET:
 		default:
+			tracef("RunLoop::add(): adding generic EventSource<%p>\n", eventSource);
 			_sources->add(eventSource);
 			break;
 	}
@@ -57,12 +60,14 @@ RunLoop::add(EventSource *eventSource)
 void
 RunLoop::processEventsWithTimeout(struct timeval *tv)
 {
-/* 	fd_set fds;
-
-		FD_ZERO(&fds);
-		_listeners.addSet(&fds);
-		::select(FD_SETSIZE, &fds, NULL, NULL, tv);
-		_listeners.processSet(&fds); */
+	if(tv)
+	{
+		tracef("RunLoop::processEventsWithTimeout({ %d, %d })\n", (int) tv->tv_sec, (int) tv->tv_usec);
+	}
+	else
+	{
+		tracef("RunLoop::processEventsWithTimeout(NULL)\n");
+	}
 	_channels->processEventsWithTimeout(tv);
 // 	foreach(_sources) ...	_sources->processPendingEvents();
 }
@@ -70,18 +75,34 @@ RunLoop::processEventsWithTimeout(struct timeval *tv)
 void
 RunLoop::runToCompletion(void)
 {
-	while(!_terminated)
+	tracef("RunLoop::runToCompletion(): run-loop starting\n");
+	while(!terminated())
 	{
 		struct timeval tv;
 
-		tv.tv_sec = 0;
-		tv.tv_usec = 250;
+		tv.tv_sec = INTERVAL_SEC;
+		tv.tv_usec = INTERVAL_USEC;
 		processEventsWithTimeout(&tv);
 	}
+	tracef("RunLoop::runToCompletion(): run-loop has been terminated\n");
 }
 
 void
 RunLoop::terminate(void)
 {
 	_terminated = true;
+}
+
+bool
+RunLoop::terminated(void)
+{
+	if(_terminated)
+	{
+		return true;
+	}
+	if(_runLoopDelegate)
+	{
+		return _runLoopDelegate->shouldRunLoopTerminate(this, this);
+	}
+	return false;
 }

@@ -42,6 +42,7 @@ Sources/Makefile
 Sources/Flux/Makefile
 Sources/Beacon/Makefile
 Samples/Makefile
+Samples/Flux/Makefile
 ])
 
 AC_OUTPUT

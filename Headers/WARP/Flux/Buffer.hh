@@ -6,13 +6,15 @@
 # include <sys/types.h>
 
 # include "Object.hh"
-# include "BufferDelegate.hh"
+# include "ChannelDelegate.hh"
 
 namespace WARP
 {
 	namespace Flux
 	{
-		class Buffer: public Object
+		struct BufferDelegate;
+
+		class Buffer: public Object, public ChannelDelegate
 		{
 		public:
 			static const size_t DEFSIZE = 4096;
@@ -54,13 +56,18 @@ namespace WARP
 			void rewindWrite(size_t bytes);
 			void rewindWrite(void);
 			void consume(size_t bytes);
-			void drain(void);
+		public:
+			virtual void channelReadPending(Object *sender, Channel *channel);
+			virtual bool isChannelReadyToReceive(Object *sender, Channel *channel);
 		protected:
 			BufferDelegate *_bufferDelegate;
 			char *_base;
 			size_t _size;
 			size_t _readPos;
 			size_t _writePos;
+
+			void drain(Object *sender);
+
 		};
 
 		class StaticBuffer: public Buffer

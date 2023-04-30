@@ -1,1 +1,1 @@
-SUBDIRS = Flux Beacon
+SUBDIRS = Flux  # Beacon

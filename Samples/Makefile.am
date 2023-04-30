@@ -1,8 +1,5 @@
-noinst_PROGRAMS = SimpleRunLoop miniserver
+SUBDIRS = Flux
 
-SimpleRunLoop_SOURCES = SimpleRunLoop.cc
-SimpleRunLoop_LDADD = ../Sources/Flux/libWARP-Flux.la
+#miniserver_SOURCES = MinimalServer.cc
 
-miniserver_SOURCES = MinimalServer.cc
-
-miniserver_LDADD = ../Sources/Flux/libWARP-Flux.la ../../Sources/Beacon/libWARP-Beacon.la
+#miniserver_LDADD = ../Sources/Flux/libWARP-Flux.la ../../Sources/Beacon/libWARP-Beacon.la

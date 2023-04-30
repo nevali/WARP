@@ -11,7 +11,10 @@ namespace WARP
 
 		struct BufferDelegate
 		{
-			virtual void bufferWritten(Object *sender, Buffer *buffer, char *base, size_t *nbytes);
+			/* invoked when the write position is advanced */
+			virtual void bufferFilled(Object *sender, Buffer *buffer, char *pos, size_t *nbytes);
+			/* invoked when the read position is advanced */
+			virtual void bufferDrained(Object *sender, Buffer *buffer, char *pos, size_t nbytes);
 		};
 	}
 }

@@ -1,6 +1,8 @@
 #ifndef WARP_FLUX_RUNLOOP_HH_
 # define WARP_FLUX_RUNLOOP_HH_
 
+# include <cstddef>
+
 # include <sys/select.h>
 
 # include "Object.hh"
@@ -14,6 +16,7 @@ namespace WARP
 		class EventSource;
 		class SubTask;
 		class Channel;
+		struct RunLoopDelegate;
 
 		/* A RunLoop repeatedly waits for one or more types of events to occur
 		 * and then triggers processing via the respective object's delegates
@@ -21,7 +24,10 @@ namespace WARP
 		class RunLoop: public Object
 		{
 			public:
-				RunLoop();
+				static const int INTERVAL_SEC = 30;
+				static const int INTERVAL_USEC = 0;
+			public:
+				RunLoop(RunLoopDelegate *delegate = NULL);
 			protected:
 				virtual ~RunLoop();
 			public:
@@ -35,7 +41,9 @@ namespace WARP
 				virtual void processEventsWithTimeout(struct timeval *tv = NULL);
 				virtual void runToCompletion(void);
 				virtual void terminate(void);
-			protected:
+				virtual bool terminated(void);
+			private:
+				RunLoopDelegate *_runLoopDelegate;
 				bool _terminated;
 				TArray<EventSource> *_sources;
 				ChannelSet *_channels;

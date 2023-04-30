@@ -1,7 +1,7 @@
 #ifndef WARP_BEACON_DEMUX_HH_
 # define WARP_BEACON_DEMUX_HH_
 
-#include "WARP/Core/Listener.hh"
+#include "WARP/Flux/Listener.hh"
 
 #include "Packet.hh"
 #include "MuxDelegate.hh"

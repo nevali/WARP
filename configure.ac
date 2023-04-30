@@ -38,9 +38,10 @@ LT_INIT
 
 AC_CONFIG_FILES([
 Makefile
-Core/Makefile
-Beacon/Makefile
-MiniServer/Makefile
+Sources/Makefile
+Sources/Flux/Makefile
+Sources/Beacon/Makefile
+Samples/Makefile
 ])
 
 AC_OUTPUT

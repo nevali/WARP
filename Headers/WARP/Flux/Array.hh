@@ -11,7 +11,7 @@ namespace WARP
 	{
 		namespace Internal
 		{
-			class ArrayData;
+			struct ArrayData;
 
 			class Array: public Object
 			{
@@ -26,8 +26,8 @@ namespace WARP
 				protected:
 					virtual size_t indexOfPointer(void *ptr) const;
 					virtual void *pointerAtIndex(size_t index) const;
-					virtual void addPointer(void *ptr);
-					virtual void removePointer(void *ptr);
+					virtual size_t addPointer(void *ptr);
+					virtual bool removePointer(void *ptr);
 					virtual void pointerWasRemoved(void *ptr) const;
 				private:
 					ArrayData *_data;

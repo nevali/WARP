@@ -3,6 +3,7 @@
 #endif
 
 #include <cstdio>
+#include <cstdlib>
 #include <cassert>
 #include <cerrno>
 #include <cstring>
@@ -10,6 +11,7 @@
 #include <signal.h>
 #include <spawn.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "WARP/Flux/Diagnostics.hh"
 #include "WARP/Flux/SubTask.hh"

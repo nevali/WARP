@@ -18,7 +18,8 @@ namespace WARP
 					CHANNELSET,
 					LISTENER,
 					TASK,
-					RUNLOOP		
+					RUNLOOP,
+					PIPE
 				} Kind;
 			protected:
 				Object();

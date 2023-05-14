@@ -66,6 +66,12 @@ Pipe::~Pipe()
 	close(_filedes[1]);
 }
 
+Object::Kind
+Pipe::kind(void) const
+{
+	return Object::PIPE;
+}
+
 int
 Pipe::receiver(void) const
 {

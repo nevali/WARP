@@ -20,7 +20,7 @@ namespace WARP
 			virtual ~Socket();
 		public:
 		 	/* additional operations */
-			virtual int pending(void);
+//			virtual int pending(void);
 /*			virtual ssize_t read(void *buf, size_t length);
 			virtual ssize_t read(void *buf, size_t length, int flags);
 			virtual ssize_t write(const void *buf, size_t length);

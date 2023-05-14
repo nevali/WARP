@@ -21,6 +21,10 @@ struct WARP::Flux::Internal::ArrayData
 
 	ArrayData(): size(0), count(0), ptr(NULL) { }
 
+	virtual ~ArrayData()
+	{
+		::free(ptr);
+	}
 	void expand(void);
 };
 
@@ -116,6 +120,7 @@ Array::removePointer(void *ptr)
 			{
 				pointerWasRemoved(ptr);
 				removed = true;
+				_data->count--;
 			}
 		}
 	}
@@ -147,7 +152,7 @@ ArrayData::expand(void)
 {
 	void **p;
 
-	p = (void **) ::realloc(ptr, sizeof(void *) * size + BLOCKSIZE);
+	p = (void **) ::realloc(ptr, sizeof(void *) * (size + BLOCKSIZE));
 	if(!p)
 	{
 		::abort();

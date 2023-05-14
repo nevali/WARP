@@ -104,6 +104,10 @@ Listener::ClientSet::ClientSet():
 {
 }
 
+Listener::ClientSet::~ClientSet()
+{
+}
+
 #if BROKEN
 void
 Listener::ClientSet::addSet(fd_set *set)

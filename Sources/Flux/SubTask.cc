@@ -35,6 +35,12 @@ SubTask::~SubTask()
 	posix_spawnattr_destroy(&_attrs);
 }
 
+Object::Kind
+SubTask::kind(void) const
+{
+	return Object::TASK;
+}
+
 void
 SubTask::processPendingEvents(void)
 {

@@ -41,8 +41,8 @@ namespace WARP
 				protected:
 					virtual ~ClientSet();
 				public:
-					virtual void addSet(fd_set *set);
-					virtual void processSet(fd_set *set);
+//					virtual void addSet(fd_set *set);
+//					virtual void processSet(fd_set *set);
 			};
 		protected:
 			Listener(ChannelDelegate *delegate);

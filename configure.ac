@@ -15,6 +15,12 @@
 
 ## BuildScripts/get-version.sh generates a version number from git tags
 AC_INIT([WARP],[0.0])
+AC_PREFIX_DEFAULT([/opt/WARP])
+
+## Prevent autoconf from supplying undesirable defaults if not already set
+: ${CFLAGS=""}
+: ${CXXFLAGS=""}
+
 ## M4 macros are in a subdirectory named "M4"
 AC_CONFIG_MACRO_DIR([M4])
 ## Build scripts are in a subdirectory named "BuildScripts"
@@ -23,9 +29,6 @@ AC_CONFIG_AUX_DIR([BuildScripts])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_MAINTAINER_MODE
 
-AS_VAR_APPEND([AM_CPPFLAGS],[" -W -Wall"])
-AS_VAR_APPEND([AM_CXXFLAGS],[" -O0 -g"])
-
 AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/PrivateHeaders"])
 AS_VAR_APPEND([AM_CPPFLAGS],[" -I\${top_srcdir}/Headers"])
 
@@ -33,6 +36,11 @@ AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_CXXFLAGS])
 
 AC_PROG_CXX
+
+if test x"$GXX" = x"yes" ; then
+	AS_VAR_APPEND([AM_CPPFLAGS],[" -W -Wall"])
+	AS_VAR_APPEND([AM_CXXFLAGS],[" -O0 -g"])
+fi
 
 LT_INIT
 

@@ -47,7 +47,8 @@ namespace WARP
 					}
 
 				public:
-					size_t add(T *object)
+					/* adding an object retains it */
+					virtual size_t add(T *object)
 					{
 						if(object && indexOfObject(object) == NOTFOUND)
 						{
@@ -57,19 +58,26 @@ namespace WARP
 						return NOTFOUND;
 					}
 
-					bool remove(T *object)
+					/* removing an object releases it */
+					virtual bool remove(T *object)
 					{
 						return Array::removePointer(object);
 					}
 
-					size_t indexOfObject(T *object)
+					virtual size_t indexOfObject(T *object)
 					{
 						return Array::indexOfPointer(object);
 					}
 
-					T *objectAtIndex(size_t index) const __attribute__ ((warn_unused_result))
+					/* obtaining an object retains it for you -- you must release when done */
+					virtual T *objectAtIndex(size_t index) const __attribute__ ((warn_unused_result))
 					{
-						return static_cast<T *>(Array::pointerAtIndex(index));
+						T *object = static_cast<T *>(Array::pointerAtIndex(index));
+						if(object)
+						{
+							object->retain();
+						}
+						return object;
 					}
 				protected:
 				 	/* invoked by the base implementation automatically

@@ -20,6 +20,7 @@ namespace WARP
 				protected:
 					Array(void);
 					virtual ~Array();
+					virtual void objectWillBeDestroyed(void);
 				public:
 					virtual Kind kind(void) const;
 					virtual size_t count(void) const;

@@ -24,6 +24,7 @@ namespace WARP
 			protected:
 				Object();
 				virtual ~Object();
+				virtual void objectWillBeDestroyed(void);
 			public:
 				virtual unsigned retain(void);
 				virtual unsigned release(void);

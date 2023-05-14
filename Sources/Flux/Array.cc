@@ -33,7 +33,8 @@ Array::Array()
 	_data = new ArrayData();
 }
 
-Array::~Array()
+void
+Array::objectWillBeDestroyed(void)
 {
 	for(size_t index = 0; index < _data->size; index++)
 	{
@@ -42,6 +43,10 @@ Array::~Array()
 			pointerWasRemoved(_data->ptr[index]);
 		}
 	}
+}
+
+Array::~Array()
+{
 	delete _data;
 }
 

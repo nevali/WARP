@@ -28,6 +28,7 @@ Object::release(void)
 	if(_refCount == 1)
 	{
 		_refCount--;
+		objectWillBeDestroyed();
 		delete this;
 		return 0;
 	}
@@ -39,4 +40,9 @@ Object::Kind
 Object::kind(void) const
 {
 	return OBJECT;
+}
+
+void
+Object::objectWillBeDestroyed(void)
+{
 }

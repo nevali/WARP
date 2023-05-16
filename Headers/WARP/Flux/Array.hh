@@ -94,7 +94,8 @@ namespace WARP
 		}
 
 		using Internal::TArray;
-
+		typedef Internal::Array PointerArray;
+		
 		typedef TArray<Object> Array;
 	}
 }

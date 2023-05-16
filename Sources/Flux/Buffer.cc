@@ -199,7 +199,7 @@ Buffer::channelReadPending(Object *sender, Channel *channel)
 	}
 	if(writePosition() && _bufferDelegate)
 	{
-		debugf("Buffer::channelReadReady(): draining remainder of buffer\n");
+		debugf("Buffer::channelReadPending(): draining remainder of buffer\n");
 		drain(sender);
 	}
 }
@@ -212,5 +212,4 @@ Buffer::isChannelReadyToReceive(Object *sender, Channel *channel)
 	ready = remainingWrite() ? true : false;
 	tracef("Buffer<%p>: Channel<%p>[#%d] %s ready to receive (Sender = Object<%p>); remainingWrite = %lu\n", this, channel, channel->descriptor(), (ready ? " IS " : " IS NOT "), sender, remainingWrite());
 	return ready;
-
 }

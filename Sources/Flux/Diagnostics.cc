@@ -34,7 +34,7 @@ static void diag_prefix(DiagnosticLevel level, char *buf, size_t bufsize);
 static void writeBuf(void);
 
 static StaticBuffer diagbuf;
-static DiagnosticLevel diagLevel = DIAG_TRACE;
+static DiagnosticLevel diagLevel = DIAG_DEBUG;
 
 
 void

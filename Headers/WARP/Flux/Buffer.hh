@@ -7,6 +7,7 @@
 
 # include "Object.hh"
 # include "ChannelDelegate.hh"
+# include "BufferDelegate.hh"
 
 namespace WARP
 {
@@ -20,6 +21,29 @@ namespace WARP
 			static const size_t DEFSIZE = 4096;
 
 			Buffer(BufferDelegate *delegate = NULL, size_t nbytes = DEFSIZE);
+
+			inline BufferDelegate *bufferDelegate(void) const
+			{
+				return _bufferDelegate;
+			}
+
+			inline void setBufferDelegate(BufferDelegate *delegate)
+			{
+				if(!_bufferDelegate)
+				{
+					_bufferDelegate = delegate;
+					_bufferDelegate->becameBufferDelegateFor(this, this);
+				}
+			}
+
+			inline void clearBufferDelegate(BufferDelegate *delegate)
+			{
+				if(_bufferDelegate == delegate)
+				{
+					_bufferDelegate = NULL;
+				}
+			}
+
 		protected:
 			virtual ~Buffer();
 		public:
@@ -57,6 +81,8 @@ namespace WARP
 			void rewindWrite(void);
 			void consume(size_t bytes);
 		public:
+			virtual void channelOpened(Object *sender, Channel *channel);
+			virtual void channelClosed(Object *sender, Channel *channel);
 			virtual void channelReadPending(Object *sender, Channel *channel);
 			virtual bool isChannelReadyToReceive(Object *sender, Channel *channel);
 		protected:

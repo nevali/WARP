@@ -5,6 +5,7 @@
 
 # include "EventSource.hh"
 # include "BufferDelegate.hh"
+# include "ChannelDelegate.hh"
 
 namespace WARP
 {
@@ -51,6 +52,23 @@ namespace WARP
 			inline ChannelDelegate *channelDelegate(void) const
 			{
 				return _delegate;
+			}
+
+			inline void setChannelDelegate(ChannelDelegate *delegate)
+			{
+				if(!_delegate)
+				{
+					_delegate = delegate;
+					_delegate->becameChannelDelegateFor(this, this);
+				}
+			}
+
+			inline void clearChannelDelegate(ChannelDelegate *delegate)
+			{
+				if(_delegate == delegate)
+				{
+					_delegate = NULL;
+				}
 			}
 
 			/* readyToReceive() allows the delegate to implement flow

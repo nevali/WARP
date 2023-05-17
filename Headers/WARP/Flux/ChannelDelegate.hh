@@ -10,9 +10,13 @@ namespace WARP
 	namespace Flux
 	{
 		class Channel;
-
+		
 		struct ChannelDelegate
 		{
+			ChannelDelegate(): _channelDelegateFor(NULL) { };
+			virtual ~ChannelDelegate();
+
+			virtual void becameChannelDelegateFor(Object *sender, Channel *channel);
 			/* Invoked when a channel has been created */
 			virtual void channelOpened(Object *sender, Channel *channel);
 			/* Invoked when a channel has been closed */
@@ -23,7 +27,10 @@ namespace WARP
 			virtual void channelWriteReady(Object *sender, Channel *channel);
 			/* Invoked to determine whether the channel is ready to receive data */
 			virtual bool isChannelReadyToReceive(Object *sender, Channel *channel);
+			private:
+				Channel *_channelDelegateFor;
 		};
+
 	}
 }
 

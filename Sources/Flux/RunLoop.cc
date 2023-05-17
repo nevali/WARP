@@ -58,6 +58,25 @@ RunLoop::add(EventSource *eventSource)
 }
 
 void
+RunLoop::remove(EventSource *eventSource)
+{
+	/* EventSources are sorted into different buckets for each of
+	 * the supported specialised interfaces
+	 */
+	switch(eventSource->kind())
+	{
+		case CHANNEL:
+			tracef("RunLoop::remove(): removing Channel<%p>\n", eventSource);
+			_channels->remove(static_cast<Channel *>(eventSource));
+			break;
+		default:
+			tracef("RunLoop::remove(): removing generic EventSource<%p>\n", eventSource);
+			_sources->remove(eventSource);
+			break;
+	}
+}
+
+void
 RunLoop::processEventsWithTimeout(struct timeval *tv)
 {
 	if(tv)
@@ -76,6 +95,10 @@ void
 RunLoop::runToCompletion(void)
 {
 	tracef("RunLoop::runToCompletion(): run-loop starting\n");
+	if(_runLoopDelegate)
+	{
+		_runLoopDelegate->runLoopIsStarting(this, this);
+	}
 	while(!terminated())
 	{
 		struct timeval tv;
@@ -83,6 +106,14 @@ RunLoop::runToCompletion(void)
 		tv.tv_sec = INTERVAL_SEC;
 		tv.tv_usec = INTERVAL_USEC;
 		processEventsWithTimeout(&tv);
+		if(_runLoopDelegate)
+		{
+			_runLoopDelegate->runLoopPass(this, this);
+		}
+	}
+	if(_runLoopDelegate)
+	{
+		_runLoopDelegate->runLoopEnded(this, this);
 	}
 	tracef("RunLoop::runToCompletion(): run-loop has been terminated\n");
 }

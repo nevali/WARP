@@ -24,8 +24,8 @@ namespace WARP
 		class RunLoop: public Object
 		{
 			public:
-				static const int INTERVAL_SEC = 30;
-				static const int INTERVAL_USEC = 0;
+				static const int INTERVAL_SEC = 0;
+				static const int INTERVAL_USEC = 100000;
 			public:
 				RunLoop(RunLoopDelegate *delegate = NULL);
 			protected:
@@ -38,6 +38,7 @@ namespace WARP
 				 * somewhat baked into the implementation of WARP::Flux::RunLoop
 				 */
 				virtual void add(EventSource *eventSource);
+				virtual void remove(EventSource *eventSource);
 				virtual void processEventsWithTimeout(struct timeval *tv = NULL);
 				virtual void runToCompletion(void);
 				virtual void terminate(void);

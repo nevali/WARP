@@ -23,6 +23,10 @@ Buffer::Buffer(BufferDelegate *delegate, size_t nbytes):
 	{
 		abort();
 	}
+	if(_bufferDelegate)
+	{
+		_bufferDelegate->becameBufferDelegateFor(this, this);
+	}
 }
 
 Buffer::~Buffer()
@@ -118,6 +122,8 @@ Buffer::drain(Object *sender)
 		return;
 	}
 	tracef("Buffer::drain(): size=%lu, writePosition=%lu\n", _size, _writePos);
+	/* retain ourselves to ensure that the delegate can't trigger our premature destruction */
+	retain();
 	size = _writePos;
 	rewindRead();
 	while(_readPos < _writePos)
@@ -140,6 +146,7 @@ Buffer::drain(Object *sender)
 	}
 	consume(_readPos);
 	debugf("Buffer::drain(): %lu bytes remain\n", size);
+	release();
 }
 
 /* consume nbytes from the start of the buffer, moving whatever remains to
@@ -212,4 +219,22 @@ Buffer::isChannelReadyToReceive(Object *sender, Channel *channel)
 	ready = remainingWrite() ? true : false;
 	tracef("Buffer<%p>: Channel<%p>[#%d] %s ready to receive (Sender = Object<%p>); remainingWrite = %lu\n", this, channel, channel->descriptor(), (ready ? " IS " : " IS NOT "), sender, remainingWrite());
 	return ready;
+}
+
+void
+Buffer::channelOpened(Object *sender, Channel *channel)
+{
+	if(_bufferDelegate)
+	{
+		_bufferDelegate->sourceOpened(sender, channel);
+	}
+}
+
+void
+Buffer::channelClosed(Object *sender, Channel *channel)
+{
+	if(_bufferDelegate)
+	{
+		_bufferDelegate->sourceClosed(sender, channel);
+	}
 }

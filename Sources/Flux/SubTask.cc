@@ -20,6 +20,7 @@
 using namespace WARP::Flux;
 
 SubTask::SubTask():
+	Task(),
 	_name(NULL),
 	_usePath(false),
 	_pid(0)
@@ -41,6 +42,32 @@ SubTask::kind(void) const
 	return Object::TASK;
 }
 
+int
+SubTask::run(void)
+{
+	if(_pid == 0)
+	{
+		if(!launch())
+		{
+			return -1;
+		}
+	}
+	waitForChild();
+	/* XXX */
+	return 0;
+}
+
+int
+SubTask::waitForChild(void)
+{
+	while(_pid > 0)
+	{
+		processChildEvents(true);
+		processPipeEvents();
+	}
+	return 0;
+}
+
 void
 SubTask::processPendingEvents(void)
 {
@@ -57,7 +84,7 @@ SubTask::processPendingEvents(void)
 		return;
 	}
 	processPipeEvents();
-	processChildEvents();
+	processChildEvents(false);
 	return;
 }
 
@@ -67,15 +94,16 @@ SubTask::processPipeEvents(void)
 }
 
 void
-SubTask::processChildEvents(void)
+SubTask::processChildEvents(bool shouldWait)
 {
 	pid_t r;
-	int status;
+	int status, options;
 	
 	if(_pid < 1)
 	{
 		return;
 	}
+	options = shouldWait ? 0 : WNOHANG;
 	do
 	{
 		r = ::waitpid(_pid, &status, WNOHANG);
@@ -91,6 +119,7 @@ SubTask::processChildEvents(void)
 	if(r < 0)
 	{
 		perror("waitpid");
+		/* XXX */
 		exit(EXIT_FAILURE);
 	}
 	if(r > 0)

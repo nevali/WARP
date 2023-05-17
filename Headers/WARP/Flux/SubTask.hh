@@ -3,20 +3,21 @@
 
 #include <spawn.h>
 
-#include "EventSource.hh"
+#include "Task.hh"
 #include "Pipe.hh"
 
 namespace WARP
 {
 	namespace Flux
 	{
-		class SubTask: public EventSource
+		class SubTask: public Task
 		{
 			public:
 				SubTask();
 			protected:
 				virtual ~SubTask();
 			public:
+				virtual int run(void);
 				virtual Kind kind(void) const;
 				virtual void processPendingEvents(void);
 			protected:
@@ -27,8 +28,9 @@ namespace WARP
 				void bindOutput(Pipe *pipe);
 			protected:
 				virtual void processPipeEvents(void);
-				virtual void processChildEvents(void);
+				virtual void processChildEvents(bool wait);
 				virtual void childWasSignalled(pid_t pid, int status);
+				virtual int waitForChild(void);
 			protected:
 				char *_name;
 				bool _usePath;

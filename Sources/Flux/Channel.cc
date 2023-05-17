@@ -22,6 +22,7 @@ Channel::Channel(ChannelDelegate *delegate, int fd):
 {
 	if(delegate)
 	{
+		delegate->becameChannelDelegateFor(this, this);
 		delegate->channelOpened(this, this);
 	}
 }

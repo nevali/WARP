@@ -14,6 +14,7 @@
 #  include "Object.hh"
 #  include "Pipe.hh"
 #  include "Socket.hh"
+#  include "Task.hh"
 #  include "SubTask.hh"
 #  include "RunLoop.hh"
 #  include "RunLoopDelegate.hh"

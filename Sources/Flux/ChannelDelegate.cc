@@ -13,20 +13,13 @@ using namespace WARP::Flux;
 
 ChannelDelegate::~ChannelDelegate()
 {
-	if(_channelDelegateFor)
-	{
-		tracef("ChannelDelegate::%s() ceasing to be delegate for Channel<%p>\n", __FUNCTION__, _channelDelegateFor);
-		_channelDelegateFor->clearChannelDelegate(this);
-		_channelDelegateFor = NULL;
-	}
 }
 
 void
 ChannelDelegate::becameChannelDelegateFor(Object *sender, Channel *channel)
 {
 	(void) sender;
-
-	_channelDelegateFor = channel;
+	(void) channel;
 }
 
 void

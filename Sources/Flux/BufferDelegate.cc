@@ -10,21 +10,15 @@ using namespace WARP::Flux;
 
 BufferDelegate::~BufferDelegate()
 {
-	if(_bufferDelegateFor)
-	{
-		tracef("BufferDelegate::%s() ceasing to be delegate for Buffer<%p>\n", __FUNCTION__, _bufferDelegateFor);
-		_bufferDelegateFor->clearBufferDelegate(this);
-		_bufferDelegateFor = NULL;
-	}
 }
 
 void
 BufferDelegate::becameBufferDelegateFor(Object *sender, Buffer *buffer)
 {
 	(void) sender;
+	(void) buffer;
 
-	_bufferDelegateFor = buffer;
-	tracef("BufferDelegate::%s() are now delegate for Buffer<%p>\n", __FUNCTION__, _bufferDelegateFor);
+	tracef("BufferDelegate::%s() are now delegate for Buffer<%p>\n", __FUNCTION__, buffer);
 }
 
 void

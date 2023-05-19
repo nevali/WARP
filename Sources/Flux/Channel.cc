@@ -18,7 +18,9 @@ using namespace WARP::Flux;
 Channel::Channel(ChannelDelegate *delegate, int fd):
 	EventSource(),
 	_delegate(delegate),
-	_descriptor(fd)
+	_descriptor(fd),
+	_readPending(false),
+	_writePending(false)
 {
 	if(delegate)
 	{

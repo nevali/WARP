@@ -13,7 +13,7 @@ namespace WARP
 		
 		struct ChannelDelegate
 		{
-			ChannelDelegate(): _channelDelegateFor(NULL) { };
+			ChannelDelegate() { };
 			virtual ~ChannelDelegate();
 
 			virtual void becameChannelDelegateFor(Object *sender, Channel *channel);
@@ -27,8 +27,6 @@ namespace WARP
 			virtual void channelWriteReady(Object *sender, Channel *channel);
 			/* Invoked to determine whether the channel is ready to receive data */
 			virtual bool isChannelReadyToReceive(Object *sender, Channel *channel);
-			private:
-				Channel *_channelDelegateFor;
 		};
 
 	}

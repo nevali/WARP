@@ -13,7 +13,7 @@ namespace WARP
 
 		struct BufferDelegate
 		{
-			BufferDelegate(): _bufferDelegateFor(NULL) { };
+			BufferDelegate() { };
 			virtual ~BufferDelegate();
 			
 			virtual void becameBufferDelegateFor(Object *sender, Buffer *buffer);
@@ -25,8 +25,6 @@ namespace WARP
 			virtual void sourceOpened(Object *sender, Object *source);
 			/* Invoked when a source has been closed */
 			virtual void sourceClosed(Object *sender, Object *source);
-			private:
-				Buffer *_bufferDelegateFor;
 		};
 	}
 }

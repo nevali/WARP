@@ -154,6 +154,7 @@ ChannelSet::processChannelCallback(void *ptr, void *ctx)
 	channel = static_cast<Channel *>(ptr);
 	set = static_cast<ChannelSet *>(ctx);
 
+	channel->retain();
 	fd = channel->descriptor();
 	tracef("ChannelSet::processChannelCallback(Channel<%p>[#%d], ChannelSet<%p>)\n", channel, fd, set);
 
@@ -161,6 +162,7 @@ ChannelSet::processChannelCallback(void *ptr, void *ctx)
 	{
 		tracef("ChannelSet::processChannelCallback(): FD_ISSET(errors) is true for Channel<%p>(#%d)\n", channel, fd);
 		channel->close();
+		channel->release();
 		return true;
 	}
 	if(FD_ISSET(fd, &(set->_readers)))
@@ -171,6 +173,7 @@ ChannelSet::processChannelCallback(void *ptr, void *ctx)
 	{
 		channel->setWriteReady();
 	}
+	channel->release();
 	return true;
 }
 
@@ -183,93 +186,3 @@ ChannelSet::processPendingEvents(void)
 	tv.tv_usec = 0;
 	processEventsWithTimeout(&tv);
 }
-
-#if BROKEN
-
-SocketSet::SocketSet():
-	_clients(NULL),
-	_nclients(0)
-{
-}
-
-SocketSet::~SocketSet()
-{
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		delete _clients[n];
-	}
-	free(_clients);
-}
-
-void
-SocketSet::add(Socket *client)
-{
-	Socket **p;
-
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		if(_clients[n] == client)
-		{
-			return;
-		}
-	}
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		if(!_clients[n])
-		{
-			_clients[n] = client;
-			return;
-		}
-	}
-	p = (Socket **) realloc(_clients, sizeof(Socket *) * (_nclients + 2));
-	if(!p)
-	{
-		abort();
-	}
-	_clients = p;
-	p[_nclients] = client;
-	_nclients++;
-	p[_nclients] = NULL;
-}
-
-void
-SocketSet::remove(Socket *client)
-{
-	(void) client;
-
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		if(_clients[n] == client)
-		{
-			_clients[n] = NULL;
-		}
-	}
-}
-
-void
-SocketSet::addSet(fd_set *set)
-{
-	tracef("SocketSet::addSet: nclients = %d\n", (int) _nclients);
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		if(_clients[n] && _clients[n]->_fd >= 0)
-		{
-			_clients[n]->addSet(set);
-		}
-	}
-}
-
-void
-SocketSet::processSet(fd_set *set)
-{
-	tracef("SocketSet::processSet: nclients = %d\n", (int) _nclients);
-	for(size_t n = 0; n < _nclients; n++)
-	{
-		if(_clients[n] && _clients[n]->_fd >= 0)
-		{
-			_clients[n]->processSet(set);
-		}
-	}
-}
-
-#endif

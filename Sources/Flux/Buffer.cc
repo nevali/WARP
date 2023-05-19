@@ -189,6 +189,7 @@ Buffer::channelReadPending(Object *sender, Channel *channel)
 	ssize_t l;
 
 	tracef("Buffer<%p>: Channel<%p>[#%d] is ready for read (Sender = Object<%p>)\n", this, channel, channel->descriptor(), sender);
+	retain();
 	while(channel->readPending() && remainingWrite())
 	{
 		l = channel->read(this);
@@ -209,6 +210,7 @@ Buffer::channelReadPending(Object *sender, Channel *channel)
 		debugf("Buffer::channelReadPending(): draining remainder of buffer\n");
 		drain(sender);
 	}
+	release();
 }
 
 bool
@@ -226,7 +228,9 @@ Buffer::channelOpened(Object *sender, Channel *channel)
 {
 	if(_bufferDelegate)
 	{
+		retain();
 		_bufferDelegate->sourceOpened(sender, channel);
+		release();
 	}
 }
 
@@ -235,6 +239,8 @@ Buffer::channelClosed(Object *sender, Channel *channel)
 {
 	if(_bufferDelegate)
 	{
+		retain();
 		_bufferDelegate->sourceClosed(sender, channel);
+		release();
 	}
 }

@@ -59,11 +59,13 @@ Channel::close(void)
 		debugf("Channel<%p>[#%d]::close(): %s\n", this, _descriptor, strerror(errno));
 		return false;
 	}
+	_descriptor = -1;
 	if(_delegate)
 	{
+		retain();
 		_delegate->channelClosed(this, this);
+		release();
 	}
-	_descriptor = -1;
 	return true;
 }
 
@@ -219,11 +221,19 @@ Channel::setStatusFlags(int flags)
 bool
 Channel::readyToReceive(void)
 {
+	bool r;
+
 	if(_delegate)
 	{
-		return _delegate->isChannelReadyToReceive(this, this);
+		retain();
+		r = _delegate->isChannelReadyToReceive(this, this);
+		release();
 	}
-	return true;
+	else
+	{
+		r = true;
+	}
+	return r;
 }
 
 void
@@ -236,7 +246,9 @@ Channel::setWriteReady(void)
 	_writePending = true;
 	if(_delegate)
 	{
+		retain();
 		_delegate->channelWriteReady(this, this);
+		release();
 	}
 }
 
@@ -250,7 +262,9 @@ Channel::setReadPending(void)
 	_readPending = true;
 	if(_delegate)
 	{
+		retain();
 		_delegate->channelReadPending(this, this);
+		release();
 	}
 }
 

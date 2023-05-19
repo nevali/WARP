@@ -59,7 +59,9 @@ namespace WARP
 				if(!_delegate)
 				{
 					_delegate = delegate;
+					retain();
 					_delegate->becameChannelDelegateFor(this, this);
+					release();
 				}
 			}
 

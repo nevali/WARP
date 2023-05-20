@@ -16,6 +16,7 @@
 #include "WARP/Flux/ChannelDelegate.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 ChannelSet::ChannelSet():
 	TArray<Channel>(),

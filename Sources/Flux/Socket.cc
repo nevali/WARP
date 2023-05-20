@@ -11,6 +11,7 @@
 #include "WARP/Flux/Socket.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 Socket::Socket(ChannelDelegate *delegate, int fd):
 	Channel(delegate, fd)

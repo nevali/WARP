@@ -18,6 +18,7 @@
 #include "WARP/Flux/Pipe.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 SubTask::SubTask():
 	Task(),

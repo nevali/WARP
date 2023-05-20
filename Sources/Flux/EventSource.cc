@@ -6,6 +6,7 @@
 #include "WARP/Flux/EventSource.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 EventSource::EventSource():
 	Object()

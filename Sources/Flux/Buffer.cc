@@ -11,6 +11,7 @@
 #include "WARP/Flux/Channel.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 Buffer::Buffer(BufferDelegate *delegate, size_t nbytes):
 	_bufferDelegate(delegate),
@@ -117,7 +118,7 @@ Buffer::drain(Object *sender)
 
 	if(!_bufferDelegate)
 	{
-		debugf("Buffer::drain(): no delegate to receive buffer\n");
+		tracef("Buffer::drain(): no delegate to receive buffer\n");
 		reset();
 		return;
 	}
@@ -129,23 +130,23 @@ Buffer::drain(Object *sender)
 	while(_readPos < _writePos)
 	{
 		consumed = size;
-		debugf("Buffer::drain(): readPosition=%lu, writePosition=%lu, size=%lu\n", _readPos, _writePos, consumed);
+		tracef("Buffer::drain(): readPosition=%lu, writePosition=%lu, size=%lu\n", _readPos, _writePos, consumed);
 		_bufferDelegate->bufferFilled(sender, this, _base + _readPos, &consumed);
 		if(consumed > size)
 		{
 			consumed = size;
 		}
 		advanceRead(consumed);
-		debugf("Buffer::drain(): %lu bytes were consumed by delegate\n", consumed);
+		tracef("Buffer::drain(): %lu bytes were consumed by delegate\n", consumed);
 		if(!consumed)
 		{
 			break;
 		}
 		size -= consumed;
-		debugf("Buffer::drain(): advancing read cursor by %lu bytes\n", consumed);
+		tracef("Buffer::drain(): advancing read cursor by %lu bytes\n", consumed);
 	}
 	consume(_readPos);
-	debugf("Buffer::drain(): %lu bytes remain\n", size);
+	tracef("Buffer::drain(): %lu bytes remain\n", size);
 	release();
 }
 
@@ -193,21 +194,21 @@ Buffer::channelReadPending(Object *sender, Channel *channel)
 	while(channel->readPending() && remainingWrite())
 	{
 		l = channel->read(this);
-		debugf("Buffer::channelReadPending(): read => %ld\n", l);
+		tracef("Buffer::channelReadPending(): read => %ld\n", l);
 		if(l < 0)
 		{
 			break;
 		}
 		if(!remainingWrite() && _bufferDelegate)
 		{
-			debugf("Buffer::channelReadPending(): buffer is full, draining\n");
+			tracef("Buffer::channelReadPending(): buffer is full, draining\n");
 			drain(sender);
 		}
-		debugf("Buffer::channelReadPending(): remainingWrite = %lu\n", remainingWrite());
+		tracef("Buffer::channelReadPending(): remainingWrite = %lu\n", remainingWrite());
 	}
 	if(writePosition() && _bufferDelegate)
 	{
-		debugf("Buffer::channelReadPending(): draining remainder of buffer\n");
+		tracef("Buffer::channelReadPending(): draining remainder of buffer\n");
 		drain(sender);
 	}
 	release();

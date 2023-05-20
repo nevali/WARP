@@ -16,6 +16,7 @@
 #include "WARP/Flux/RunLoopDelegate.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 RunLoop::RunLoop(RunLoopDelegate *delegate):
 	Object(),

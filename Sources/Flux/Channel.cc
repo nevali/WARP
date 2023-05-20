@@ -14,6 +14,7 @@
 #include "WARP/Flux/Buffer.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 Channel::Channel(ChannelDelegate *delegate, int fd):
 	EventSource(),
@@ -56,7 +57,7 @@ Channel::close(void)
 	while(r == -1 && (errno == EINTR || errno == EAGAIN));
 	if(r == -1)
 	{
-		debugf("Channel<%p>[#%d]::close(): %s\n", this, _descriptor, strerror(errno));
+		tracef("Channel<%p>[#%d]::close(): %s\n", this, _descriptor, strerror(errno));
 		return false;
 	}
 	_descriptor = -1;
@@ -84,10 +85,10 @@ Channel::read(void *buf, size_t buflen)
 		r = ::read(_descriptor, buf, buflen);
 	}
 	while(r == -1 && errno == EINTR);
-	debugf("Channel<%p>[#%d]::read() = %ld\n", this, _descriptor, r);
+	tracef("Channel<%p>[#%d]::read() = %ld\n", this, _descriptor, r);
 	if(r < 0)
 	{
-		debugf("Channel<%p>[#%d]::read(): %s\n", this, _descriptor, strerror(errno));
+		tracef("Channel<%p>[#%d]::read(): %s\n", this, _descriptor, strerror(errno));
 		if(errno == EAGAIN)
 		{
 			_readPending = false;

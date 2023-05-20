@@ -9,6 +9,7 @@
 #include "WARP/Flux/Array.hh"
 
 using namespace WARP::Flux::Internal;
+using namespace WARP::Flux::Diagnostics;
 using WARP::Flux::Object;
 
 struct WARP::Flux::Internal::ArrayData
@@ -18,8 +19,9 @@ struct WARP::Flux::Internal::ArrayData
 	size_t size;
 	size_t count;
 	void **ptr;
+	bool destructing;
 
-	ArrayData(): size(0), count(0), ptr(NULL) { }
+	ArrayData(): size(0), count(0), ptr(NULL), destructing(false) { }
 
 	virtual ~ArrayData()
 	{
@@ -36,6 +38,7 @@ Array::Array()
 void
 Array::objectWillBeDestroyed(void)
 {
+	_data->destructing = true;
 	for(size_t index = 0; index < _data->size; index++)
 	{
 		if(_data->ptr[index])
@@ -47,6 +50,7 @@ Array::objectWillBeDestroyed(void)
 
 Array::~Array()
 {
+	_data->destructing = true;
 	delete _data;
 }
 
@@ -65,7 +69,7 @@ Array::count(void) const
 size_t
 Array::indexOfPointer(void *ptr) const
 {
-	if(!ptr)
+	if(!ptr || _data->destructing)
 	{
 		return Array::NOTFOUND;
 	}
@@ -82,6 +86,10 @@ Array::indexOfPointer(void *ptr) const
 void *
 Array::pointerAtIndex(size_t index) const
 {
+	if(_data->destructing)
+	{
+		return NULL;
+	}
 	if(index >= _data->size)
 	{
 		return NULL;
@@ -94,6 +102,10 @@ Array::addPointer(void *ptr)
 {
 	size_t index;
 
+	if(_data->destructing)
+	{
+		return NOTFOUND;
+	}
 	for(index = 0; index < _data->size; index++)
 	{
 		if(NULL == _data->ptr[index])
@@ -115,6 +127,10 @@ Array::removePointer(void *ptr)
 	size_t index;
 	bool removed;
 
+	if(_data->destructing)
+	{
+		return false;
+	}
 	removed = false;
 	for(index = 0; index < _data->size; index++)
 	{

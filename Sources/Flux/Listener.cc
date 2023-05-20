@@ -15,6 +15,7 @@
 #include "WARP/Flux/ChannelDelegate.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 Listener::Listener(ChannelDelegate *delegate):
 	Socket(delegate),

@@ -6,6 +6,7 @@
 #include "WARP/Flux/RunLoopDelegate.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 void
 RunLoopDelegate::runLoopIsStarting(Object *sender, RunLoop *loop)

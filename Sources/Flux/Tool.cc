@@ -9,6 +9,7 @@
 #include "WARP/Flux/RunLoop.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 Tool::Tool(int argc, char **argv):
 	Task(),

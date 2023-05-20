@@ -16,6 +16,7 @@
 #include "WARP/Flux/Pipe.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 static bool
 setCloseOnExec(int fd)

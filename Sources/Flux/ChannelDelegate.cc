@@ -10,6 +10,7 @@
 #include "WARP/Flux/Channel.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 ChannelDelegate::~ChannelDelegate()
 {

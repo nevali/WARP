@@ -7,6 +7,7 @@
 #include "WARP/Flux/Buffer.hh"
 
 using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 BufferDelegate::~BufferDelegate()
 {

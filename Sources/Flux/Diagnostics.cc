@@ -13,7 +13,7 @@
 #include "WARP/Flux/Diagnostics.hh"
 #include "WARP/Flux/Buffer.hh"
 
-using namespace WARP::Flux;
+using namespace WARP::Flux::Diagnostics;
 
 #define DUMPWIDTH 16
 
@@ -33,16 +33,68 @@ static const uint8_t *dump_row(const uint8_t *base, size_t width, ADDR *length, 
 static void diag_prefix(DiagnosticLevel level, char *buf, size_t bufsize);
 static void writeBuf(void);
 
-static StaticBuffer diagbuf;
+static WARP::Flux::StaticBuffer diagbuf;
 static DiagnosticLevel diagLevel = DIAG_INFO;
+static DiagnosticCallback callback = NULL;
+static void *callbackContext = NULL;
 
+class StaticDiagnostic: public Diagnostic
+{
+	public:
+		StaticDiagnostic(DiagnosticLevel level, const char *message):
+			_level(level),
+			_message(message)
+		{
+		}
+	public:		
+		virtual DiagnosticLevel level(void) const
+		{
+			return _level;
+		}
+
+		virtual const char *message(void) const
+		{
+			return _message;
+		}
+	private:
+		DiagnosticLevel _level;
+		const char *_message;
+};
+
+bool
+WARP::Flux::Diagnostics::setDiagnosticCallback(DiagnosticCallback cb, void *context)
+{
+	callback = cb;
+	callbackContext = context;
+	return true;
+}
+
+DiagnosticLevel
+WARP::Flux::Diagnostics::setDiagnosticLevel(DiagnosticLevel newLevel)
+{
+	DiagnosticLevel oldLevel = diagLevel;
+	diagLevel = newLevel;
+	return oldLevel;
+}
+
+DiagnosticLevel
+WARP::Flux::Diagnostics::diagnosticLevel(void)
+{
+	return diagLevel;
+}
 
 void
-WARP::Flux::diag(DiagnosticLevel level, const char *str)
+WARP::Flux::Diagnostics::diag(DiagnosticLevel level, const char *str)
 {
 	size_t size;
 	char *ptr;
 
+	if(callback)
+	{
+		StaticDiagnostic d(level, str);
+		callback(&d, callbackContext);
+		return;
+	}
 	if(level < diagLevel)
 	{
 		return;
@@ -58,11 +110,18 @@ WARP::Flux::diag(DiagnosticLevel level, const char *str)
 }
 
 void
-WARP::Flux::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
+WARP::Flux::Diagnostics::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
 {
 	size_t size;
 	char *ptr;
 
+	if(callback)
+	{
+		vsnprintf(diagbuf.base(), diagbuf.size(), format, ap);
+		StaticDiagnostic d(level, diagbuf.base());
+		callback(&d, callbackContext);
+		return;
+	}
 	if(level < diagLevel)
 	{
 		return;
@@ -79,32 +138,32 @@ WARP::Flux::vdiagf(DiagnosticLevel level, const char *format, va_list ap)
 }
 
 void
-WARP::Flux::diagf(DiagnosticLevel level, const char *format, ...)
+WARP::Flux::Diagnostics::diagf(DiagnosticLevel level, const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::Flux::vdiagf(level, format, ap);
+	WARP::Flux::Diagnostics::vdiagf(level, format, ap);
 	va_end(ap);
 }
 
 void
-WARP::Flux::debugf(const char *format, ...)
+WARP::Flux::Diagnostics::debugf(const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::Flux::vdiagf(DIAG_DEBUG, format, ap);
+	WARP::Flux::Diagnostics::vdiagf(DIAG_DEBUG, format, ap);
 	va_end(ap);
 }
 
 void
-WARP::Flux::tracef(const char *format, ...)
+WARP::Flux::Diagnostics::tracef(const char *format, ...)
 {
 	va_list ap;
 
 	va_start(ap, format);
-	WARP::Flux::vdiagf(DIAG_TRACE, format, ap);
+	WARP::Flux::Diagnostics::vdiagf(DIAG_TRACE, format, ap);
 	va_end(ap);
 }
 
@@ -118,7 +177,7 @@ WARP::Flux::tracef(const char *format, ...)
  *
  */
 void
-WARP::Flux::dump(const uint8_t *base, size_t length, size_t baseaddr)
+WARP::Flux::Diagnostics::dump(const uint8_t *base, size_t length, size_t baseaddr)
 {
 	ADDR offset;
 	

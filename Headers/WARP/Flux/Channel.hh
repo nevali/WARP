@@ -100,6 +100,7 @@ namespace WARP
 			virtual ssize_t read(Buffer *buf);
 			virtual ssize_t write(const void *buf, size_t nbyte);
 			virtual ssize_t write(Buffer *buf);
+			virtual bool flush(void);
 			
 			virtual int setNonBlocking(bool opt = true);
 			virtual int setCloseOnExec(bool opt = true);

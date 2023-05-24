@@ -70,6 +70,12 @@ Channel::close(void)
 	return true;
 }
 
+bool
+Channel::flush(void)
+{
+	return true;
+}
+
 ssize_t
 Channel::read(void *buf, size_t buflen)
 {
